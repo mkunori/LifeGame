@@ -38,4 +38,19 @@ public class LG1Controller {
         }
         view.repaintBoard();
     }
+
+    public void random() {
+        model.randomize();
+        view.repaintBoard();
+    }
+
+    public void clear() {
+        model.clear();
+        view.repaintBoard();
+    }
+
+    public void glider() {
+        model.placeGlider(5, 5);
+        view.repaintBoard();
+    }
 }

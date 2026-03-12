@@ -25,6 +25,7 @@ public class LG1View extends JPanel {
         setLayout(new BorderLayout());
         boardPanel = new JPanel() {
             // 画面描画
+            @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g); // 描画前に背景クリアしておかないと前の描画が残ることがある
 
@@ -65,9 +66,21 @@ public class LG1View extends JPanel {
         JButton stopButton = new JButton("Stop");
         stopButton.addActionListener(e -> controller.stop());
 
+        JButton randomButton = new JButton("Random");
+        randomButton.addActionListener(e -> controller.random());
+
+        JButton clearButton = new JButton("Clear");
+        clearButton.addActionListener(e -> controller.clear());
+
+        JButton gliderButton = new JButton("Glider");
+        gliderButton.addActionListener(e -> controller.glider());
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(startButton);
         buttonPanel.add(stopButton);
+        buttonPanel.add(randomButton);
+        buttonPanel.add(clearButton);
+        buttonPanel.add(gliderButton);
         add(buttonPanel, BorderLayout.SOUTH);
     }
 

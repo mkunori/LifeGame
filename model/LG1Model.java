@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Random;
+
 public class LG1Model {
     private int rows;
     private int cols;
@@ -90,5 +92,38 @@ public class LG1Model {
             }
         }
         return false;
+    }
+
+    // 初期配置で生存者をランダムに配置する
+    public void randomize() {
+        Random rand = new Random();
+
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                // ライフゲームではランダム20%~35%くらいがバランスよい
+                grid[r][c] = rand.nextDouble() < 0.3;
+            }
+        }
+    }
+
+    // 全セル死亡させる
+    public void clear() {
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                grid[r][c] = false;
+            }
+        }
+    }
+
+    // Gliderパターン
+    public void placeGlider(int r, int c) {
+        if (r + 2 >= rows || c + 2 >= cols) {
+            return;
+        }
+        grid[r][c + 1] = true;
+        grid[r + 1][c + 2] = true;
+        grid[r + 2][c] = true;
+        grid[r + 2][c + 1] = true;
+        grid[r + 2][c + 2] = true;
     }
 }
