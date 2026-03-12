@@ -8,27 +8,31 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.Timer;
 
 import model.LG1Model;
+import controller.LG1Controller;
 
 public class LG1View extends JPanel {
     private int cellSize = 20; // グリッド1マスあたりのサイズpx
-
-    private Timer timer; // 世代更新の間隔
-
     private JPanel boardPanel;
+    private LG1Controller controller;
+    private LG1Model model;
 
     // コンストラクタ
     public LG1View(LG1Model model) {
+        this.model = model;
+
         setLayout(new BorderLayout());
         boardPanel = new JPanel() {
             // 画面描画
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g); // 描画前に背景クリアしておかないと前の描画が残ることがある
 
-                for (int r = 0; r < 30; r++) {
-                    for (int c = 0; c < 30; c++) {
+
+                // MVCに反してViewからModelを直接参照しているが、例外的に許容する
+                // 更新はしていない、かつ描画のたびにControllerを経由するのは重たいため
+                for (int r = 0; r < model.getRows(); r++) {
+                    for (int c = 0; c < model.getCols(); c++) {
                         int x = c * cellSize;
                         int y = r * cellSize;
 
@@ -49,32 +53,31 @@ public class LG1View extends JPanel {
                 int col = e.getX() / cellSize;
                 int row = e.getY() / cellSize;
 
-                model.toggleCell(row, col);
-                boardPanel.repaint();
+                controller.toggleCell(row, col);
             }
         });
 
         add(boardPanel, BorderLayout.CENTER);
 
         JButton startButton = new JButton("Start");
+        startButton.addActionListener(e -> controller.start());
+
         JButton stopButton = new JButton("Stop");
+        stopButton.addActionListener(e -> controller.stop());
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(startButton);
         buttonPanel.add(stopButton);
         add(buttonPanel, BorderLayout.SOUTH);
+    }
 
-        timer = new Timer(200, e -> {
-            boolean changed = model.nextGeneration();
+    // ViewへControllerを教える
+    public void setController(LG1Controller controller) {
+        this.controller = controller;
+    }
 
-            // 変化なしか全滅なら自動停止する
-            if (!changed || !model.hasAliveCells()) {
-                timer.stop();
-            }
-
-            boardPanel.repaint();
-        });
-
-        startButton.addActionListener(e -> timer.start());
-        stopButton.addActionListener(e -> timer.stop());
+    // 再描画する
+    public void repaintBoard() {
+        boardPanel.repaint();
     }
 }

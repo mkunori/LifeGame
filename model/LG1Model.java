@@ -13,6 +13,14 @@ public class LG1Model {
         grid = new boolean[rows][cols];
     }
 
+    public int getRows() {
+        return rows;
+    }
+
+    public int getCols() {
+        return cols;
+    }
+
     // セルの値を取得する
     public boolean getCell(int r, int c) {
         return grid[r][c];
