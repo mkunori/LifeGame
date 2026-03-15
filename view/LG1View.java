@@ -12,35 +12,40 @@ import javax.swing.JPanel;
 import model.LG1Model;
 import controller.LG1Controller;
 
+/**
+ * LifeGame1Go の画面表示を担当するビュークラス。
+ * 盤面の描画とユーザー入力を処理する。
+ */
 public class LG1View extends JPanel {
-    private int cellSize = 20; // グリッド1マスあたりのサイズpx
+    private int cellSize = 20; // px
     private JPanel boardPanel;
     private LG1Controller controller;
     private LG1Model model;
 
-    // コンストラクタ
+    /**
+     * ビューを生成する。
+     *
+     * @param model 描画対象のモデル
+     */
     public LG1View(LG1Model model) {
         this.model = model;
 
         setLayout(new BorderLayout());
         boardPanel = new JPanel() {
-            // 画面描画
             @Override
             protected void paintComponent(Graphics g) {
-                super.paintComponent(g); // 描画前に背景クリアしておかないと前の描画が残ることがある
-
-
-                // MVCに反してViewからModelを直接参照しているが、例外的に許容する
-                // 更新はしていない、かつ描画のたびにControllerを経由するのは重たいため
+                // 描画前に背景クリアしておかないと前の描画が残ることがあるらしい
+                super.paintComponent(g);
+                // 描画時のみモデルを参照してセル状態を表示する
                 for (int r = 0; r < model.getRows(); r++) {
                     for (int c = 0; c < model.getCols(); c++) {
                         int x = c * cellSize;
                         int y = r * cellSize;
 
                         if (model.getCell(r, c)) {
-                            g.fillRect(x, y, cellSize, cellSize); // 塗りつぶす(生)
+                            g.fillRect(x, y, cellSize, cellSize);
                         } else {
-                            g.drawRect(x, y, cellSize, cellSize); // 塗りつぶさない(死)
+                            g.drawRect(x, y, cellSize, cellSize);
                         }
                     }
                 }
@@ -61,20 +66,15 @@ public class LG1View extends JPanel {
         add(boardPanel, BorderLayout.CENTER);
 
         JButton startButton = new JButton("Start");
-        startButton.addActionListener(e -> controller.start());
-
         JButton stopButton = new JButton("Stop");
-        stopButton.addActionListener(e -> controller.stop());
-
         JButton randomButton = new JButton("Random");
-        randomButton.addActionListener(e -> controller.random());
-
         JButton clearButton = new JButton("Clear");
-        clearButton.addActionListener(e -> controller.clear());
-
         JButton gliderButton = new JButton("Glider");
+        clearButton.addActionListener(e -> controller.clear());
+        randomButton.addActionListener(e -> controller.random());
+        startButton.addActionListener(e -> controller.start());
+        stopButton.addActionListener(e -> controller.stop());
         gliderButton.addActionListener(e -> controller.glider());
-
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(startButton);
         buttonPanel.add(stopButton);
@@ -84,12 +84,20 @@ public class LG1View extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    // ViewへControllerを教える
+    /**
+     * コントローラを設定する。
+     *
+     * @param controller コントローラ
+     */
     public void setController(LG1Controller controller) {
         this.controller = controller;
     }
 
-    // 再描画する
+    /**
+     * コントローラを設定する。
+     *
+     * @param controller コントローラ
+     */
     public void repaintBoard() {
         boardPanel.repaint();
     }

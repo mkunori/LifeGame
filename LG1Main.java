@@ -5,7 +5,16 @@ import controller.LG1Controller;
 import model.LG1Model;
 import view.LG1View;
 
+/**
+ * LifeGame1Go アプリケーションを起動するクラス。
+ */
 public class LG1Main {
+
+    /**
+    * アプリケーションを起動する。
+    *
+    * @param args コマンドライン引数
+    */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             // MVCインスタンスを生成する
