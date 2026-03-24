@@ -11,10 +11,10 @@ import view.LG1View;
  */
 public class LG1Controller {
 
-    /** ライフゲームの盤面状態とゲームルールを管理するモデル */
+    /** 盤面状態とゲームルールを管理するモデル */
     private LG1Model model;
 
-    /** ライフゲームの画面全体を表すビュー */
+    /** 画面全体を表すビュー */
     private LG1View view;
 
     /** 世代更新の周期ms */
@@ -35,6 +35,7 @@ public class LG1Controller {
         timer = new Timer(200, e -> step());
 
         view.updateGenerationLabel(model.getGeneration());
+        view.updateSpeedLabel(timer.getDelay());
     }
 
     /**
@@ -114,5 +115,17 @@ public class LG1Controller {
         }
 
         view.repaintBoard();
+    }
+
+    /**
+     * 世代更新の間隔を変更する。
+     *
+     * @param delay ミリ秒単位の更新間隔
+     */
+    public void setSpeed(int delay) {
+
+        timer.setDelay(delay);
+
+        view.updateSpeedLabel(delay);
     }
 }

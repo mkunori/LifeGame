@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 
 import controller.LG1Controller;
 import model.LG1Model;
@@ -15,14 +16,17 @@ import model.LG1Model;
  */
 public class LG1View extends JPanel {
 
-    /** ライフゲームのコントローラ層 */
+    /** コントローラ層 */
     private LG1Controller controller;
 
-    /** ライフゲームの盤面パネル */
+    /** 盤面パネル */
     private BoardPanel boardPanel;
 
-    /** ライフゲームの世代数ラベル */
+    /** 世代数ラベル */
     private JLabel generationLabel;
+
+    /** 速度ラベル */
+    private JLabel speedLabel;
 
     /**
      * ビューを生成する。
@@ -58,10 +62,30 @@ public class LG1View extends JPanel {
         buttonPanel.add(clearButton);
         buttonPanel.add(gliderButton);
 
-        generationLabel = new JLabel("Generation: 0");
-        buttonPanel.add(generationLabel);
+        speedLabel = new JLabel("Speed: 200 ms");
 
-        add(buttonPanel, BorderLayout.SOUTH);
+        JSlider speedSlider = new JSlider(50, 500, 200);
+        speedSlider.addChangeListener(e -> {
+            int delay = speedSlider.getValue();
+            controller.setSpeed(delay);
+        });
+        speedSlider.setMajorTickSpacing(100);
+        speedSlider.setMinorTickSpacing(50);
+        speedSlider.setPaintTicks(true);
+        speedSlider.setPaintLabels(true);
+
+        generationLabel = new JLabel("Generation: 0");
+
+        JPanel statusPanel = new JPanel();
+        statusPanel.add(speedLabel);
+        statusPanel.add(speedSlider);
+        statusPanel.add(generationLabel);
+
+        JPanel southPanel = new JPanel(new BorderLayout());
+        southPanel.add(buttonPanel, BorderLayout.NORTH);
+        southPanel.add(statusPanel, BorderLayout.SOUTH);
+
+        add(southPanel, BorderLayout.SOUTH);
     }
 
     /**
@@ -90,5 +114,14 @@ public class LG1View extends JPanel {
      */
     public void updateGenerationLabel(int generation) {
         generationLabel.setText("Generation: " + generation);
+    }
+
+    /**
+     * 速度ラベルを更新する。
+     * 
+     * @param delay 表示する更新間隔
+     */
+    public void updateSpeedLabel(int delay) {
+        speedLabel.setText("Speed: " + delay + " ms");
     }
 }
