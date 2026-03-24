@@ -49,6 +49,7 @@ Java（Swing）で作成したライフゲームアプリです。
 
 ## ■ パッケージ構成
 
+```text
  LG1Main.java              // エントリーポイント  
  model  
   └─ LG1Model.java         // ライフゲームの状態管理  
@@ -58,6 +59,7 @@ Java（Swing）で作成したライフゲームアプリです。
   └─ ControlPanel.java     // 操作UI（ボタン・ラベル・スライダー）  
  controller  
   └─ LG1Controller.java    // 入力制御・タイマー管理  
+```
 
 ---
 
