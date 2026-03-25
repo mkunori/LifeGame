@@ -3,6 +3,7 @@ package controller;
 import javax.swing.Timer;
 
 import model.LifeGameModel;
+import model.PatternType;
 import view.LifeGameView;
 
 /**
@@ -73,10 +74,10 @@ public class LifeGameController {
 
         switch (clickMode) {
             case TOGGLE -> model.toggleCell(row, col);
-            case GLIDER -> model.placeGlider(row, col);
-            case BLOCK -> model.placeBlock(row, col);
-            case BLINKER -> model.placeBlinker(row, col);
-            case GOSPER_GLIDER_GUN -> model.placeGosperGliderGun(row, col);
+            case GLIDER -> model.placePattern(PatternType.GLIDER, row, col);
+            case BLOCK -> model.placePattern(PatternType.BLOCK, row, col);
+            case BLINKER -> model.placePattern(PatternType.BLINKER, row, col);
+            case GOSPER_GLIDER_GUN -> model.placePattern(PatternType.GOSPER_GLIDER_GUN, row, col);
         }
 
         view.repaintBoard();
