@@ -1,7 +1,7 @@
 # LifeGame1Go
 
-Java（Swing）で作成したライフゲームアプリです。  
-シンプルな構成からスタートし、MVC設計やリファクタリングを通して段階的に機能を拡張しています。
+Java と Swing で作成したライフゲームアプリです。  
+シンプルな構成から作り始め、MVC設計やリファクタリングを通して段階的に機能を拡張しています。
 
 ---
 
@@ -9,40 +9,63 @@ Java（Swing）で作成したライフゲームアプリです。
 
 ライフゲーム（Conway's Game of Life）をシミュレーションできるデスクトップアプリです。
 
-ユーザーはマウス操作でセルを配置し、世代の変化を視覚的に確認できます。
+マウス操作でセルの状態を切り替えたり、各種パターンを配置したりしながら、世代ごとの変化を視覚的に確認できます。
 
 ---
 
 ## ■ 主な機能
 
-- セルのクリックによるON/OFF切り替え
+- セルのクリックによる ON / OFF 切り替え
 - 世代の自動更新（Start / Stop）
 - ランダム配置（Random）
 - 全消去（Clear）
-- Gliderパターン配置
 - 更新速度の変更（JSlider）
 - 世代数表示（Generation）
 - 状態表示（Running / Stopped）
-- ボタンの有効・無効制御
+- Start / Stop ボタンの有効・無効制御
+- モード選択用プルダウン
+- パターン配置
+  - Glider
+  - Block
+  - Blinker
+  - Gosper Glider Gun
 
 ---
 
 ## ■ 操作方法
 
-- マウスクリック：セルのON/OFF切り替え
-- Start：シミュレーション開始
-- Stop：シミュレーション停止
-- Random：ランダム配置
-- Clear：全セルをリセット
-- Glider：グライダー配置
-- スライダー：更新速度の調整
+- 盤面クリック  
+  現在のモードに応じてセルの反転またはパターン配置を行います
+
+- Start  
+  シミュレーションを開始します
+
+- Stop  
+  シミュレーションを停止します
+
+- Random  
+  盤面をランダムな状態で初期化します
+
+- Clear  
+  盤面をすべてクリアします
+
+- Speed スライダー  
+  世代更新の間隔を変更します
+
+- Mode プルダウン  
+  クリック時の動作モードを切り替えます
+  - Toggle
+  - Glider
+  - Block
+  - Blinker
+  - Gosper Glider Gun
 
 ---
 
 ## ■ 使用技術
 
 - Java
-- Swing（GUI）
+- Swing
 - MVC設計
 
 ---
@@ -50,18 +73,20 @@ Java（Swing）で作成したライフゲームアプリです。
 ## ■ パッケージ構成
 
 ```text
- Main                     // エントリーポイント
+Main                         // エントリーポイント
 
- model  
-  └─ LifeGameModel        // ライフゲームの状態管理  
+controller
+├─ LifeGameController        // 入力制御、タイマー管理、状態更新
+└─ ClickMode                 // 盤面クリック時の動作モード
 
- view  
-  ├─ LifeGameView         // 画面全体の構成  
-  ├─ BoardPanel           // 盤面描画  
-  └─ ControlPanel         // 操作UI（ボタン・ラベル・スライダー） 
-   
- controller  
-  └─ LifeGameController   // 入力制御・タイマー管理  
+model
+├─ LifeGameModel             // ライフゲームの状態管理と更新処理
+└─ PatternType               // パターン定義と表示名
+
+view
+├─ LifeGameView              // 画面全体の構成
+├─ BoardPanel                // 盤面描画とマウス入力
+└─ ControlPanel              // 操作UI（ボタン、スライダー、プルダウン、表示ラベル）
 ```
 
 ---
@@ -70,27 +95,29 @@ Java（Swing）で作成したライフゲームアプリです。
 
 ```mermaid
 classDiagram
-    class Main
     class LifeGameController
     class LifeGameModel
     class LifeGameView
     class BoardPanel
     class ControlPanel
+    class ClickMode
+    class PatternType
 
-    Main --> LifeGameController
-    Main --> LifeGameModel
-    Main --> LifeGameView
+    LifeGameController --> LifeGameModel : updates
+    LifeGameController --> LifeGameView : updates UI
+    LifeGameController --> ClickMode : manages
+    LifeGameController --> PatternType : selects
 
-    LifeGameController --> LifeGameModel
-    LifeGameController --> LifeGameView
+    LifeGameView --> BoardPanel : contains
+    LifeGameView --> ControlPanel : contains
 
-    LifeGameView --> BoardPanel
-    LifeGameView --> ControlPanel
+    BoardPanel --> LifeGameModel : reads
+    BoardPanel --> LifeGameController : notifies click
 
-    BoardPanel --> LifeGameModel
-    BoardPanel --> LifeGameController
+    ControlPanel --> LifeGameController : sends events
+    ControlPanel --> ClickMode : selects
 
-    ControlPanel --> LifeGameController
+    LifeGameModel --> PatternType : uses pattern data
 ```
 
 ---
@@ -100,52 +127,76 @@ classDiagram
 ### MVCパターンを採用
 
 - Model  
-  盤面状態・世代管理などのデータを担当  
+  盤面状態、世代管理、パターン配置、次世代計算などのデータとルールを担当
 
 - View  
-  画面描画およびUI部品を担当  
+  画面描画および UI 部品の表示を担当
 
 - Controller  
-  ユーザー操作・タイマー・状態遷移を担当  
+  ユーザー操作、タイマー制御、状態遷移、クリックモードの制御を担当
 
 ---
 
 ### Viewの分割
 
-画面の責務を明確にするため、Viewを以下のように分割しています。
+画面の責務を明確にするため、View を以下のように分割しています。
 
-- BoardPanel：盤面描画専用  
-- ControlPanel：操作UI専用  
-- LifeGameView：全体のレイアウト管理  
+- BoardPanel  
+  盤面描画と盤面クリックの受付を担当
+
+- ControlPanel  
+  ボタン、スライダー、プルダウン、状態表示を担当
+
+- LifeGameView  
+  画面全体のレイアウト管理を担当
+
+---
+
+### パターン定義の分離
+
+配置パターンは `PatternType` にまとめ、モデル側では共通の配置処理を使うようにしています。
+
+これにより、新しいパターンを追加するときは
+
+- `PatternType` にパターンを追加する
+- 必要に応じて `ClickMode` や UI に追加する
+
+という流れで拡張できるようにしています。
 
 ---
 
 ## ■ 学習ポイント
 
-- SwingによるGUI開発  
-- MVC設計の実践  
-- イベント駆動プログラミング  
-- リファクタリング（責務分離）  
-- 可読性を重視したコード設計  
+- Swing による GUI 開発
+- MVC設計の実践
+- イベント駆動プログラミング
+- Timer を使った更新処理
+- View の責務分離
+- enum を使った状態管理
+- 定数化による可読性向上
+- パターンデータと配置処理の分離
 
 ---
 
 ## ■ 今後の追加予定
 
-- パターン選択モード（Glider / Gun など）  
-- Gosper Glider Gun の実装  
-- ドラッグによるセル描画  
-- ループ検出・停止機能の強化  
-- 定数の整理（マジックナンバー排除）  
-- ControlPanelのさらなる分割  
-- 状態管理の整理（enum導入）  
-- 保存・読み込み機能  
+- パターン配置時のプレビュー表示
+  - マウスカーソル位置に仮配置を表示する
+- ドラッグによるセル描画
+- ループ検出や停止条件の強化
+- README へのスクリーンショット追加
+- クラス図の継続的な更新
+- パターンの追加
+  - Toad
+  - Beacon
+  - そのほかの代表パターン
+- 保存 / 読み込み機能
 
 ---
 
 ## ■ 開発方針
 
-- 小さく作ってから段階的に拡張  
-- 可読性を重視した実装  
-- 初学者でも理解できるコードを意識  
-- Javadocによるドキュメント整備  
+- 小さく作ってから段階的に拡張する
+- 可読性を重視した実装を心がける
+- 初学者でも追いやすい構造を意識する
+- Javadoc によるドキュメント整備を行う
