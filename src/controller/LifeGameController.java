@@ -14,12 +14,6 @@ public class LifeGameController {
     /** スライダー初期値 */
     private static final int DEFAULT_DELAY = 200;
 
-    /** Glider初期位置行 */
-    private static final int GLIDER_START_ROW = 5;
-
-    /** Glider初期位置列 */
-    private static final int GLIDER_START_COL = 5;
-
     /** 盤面クリック時の動作モード */
     private enum ClickMode {
         TOGGLE, GLIDER, BLOCK
@@ -53,6 +47,7 @@ public class LifeGameController {
         view.updateGenerationLabel(model.getGeneration());
         view.updateSpeedLabel(timer.getDelay());
         view.updateStatusLabel("Stopped");
+        view.updateModeLabel("Toggle");
         view.updateRunningState(false);
 
     }
@@ -98,6 +93,7 @@ public class LifeGameController {
      */
     public void random() {
 
+        timer.stop();
         model.randomize();
         model.resetGeneration();
 
@@ -112,32 +108,14 @@ public class LifeGameController {
      * 世代数も 0 に戻し、停止状態にする。
      */
     public void clear() {
+
+        timer.stop();
         model.clear();
         model.resetGeneration();
 
         view.updateStatusLabel("Stopped");
         view.updateRunningState(false);
         view.updateGenerationLabel(model.getGeneration());
-        view.repaintBoard();
-    }
-
-    /**
-     * Gliderパターンを配置する。
-     */
-    public void glider() {
-
-        model.placeGlider(GLIDER_START_ROW, GLIDER_START_COL);
-
-        view.repaintBoard();
-    }
-
-    /**
-     * Blockパターンを配置する。
-     */
-    public void block() {
-
-        model.placeBlock(GLIDER_START_ROW, GLIDER_START_COL);
-
         view.repaintBoard();
     }
 
@@ -178,6 +156,7 @@ public class LifeGameController {
      */
     public void setToggleMode() {
         clickMode = ClickMode.TOGGLE;
+        view.updateModeLabel("Toggle");
     }
 
     /**
@@ -185,6 +164,7 @@ public class LifeGameController {
      */
     public void setGliderMode() {
         clickMode = ClickMode.GLIDER;
+        view.updateModeLabel("Glider");
     }
 
     /**
@@ -192,5 +172,6 @@ public class LifeGameController {
      */
     public void setBlockMode() {
         clickMode = ClickMode.BLOCK;
+        view.updateModeLabel("Block");
     }
 }

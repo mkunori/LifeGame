@@ -42,18 +42,6 @@ public class ControlPanel extends JPanel {
     /** 盤面クリアボタン */
     private JButton clearButton;
 
-    /** ステータス表示ラベル */
-    private JLabel statusLabel;
-
-    /** 更新間隔表示ラベル */
-    private JLabel speedLabel;
-
-    /** 世代数表示ラベル */
-    private JLabel generationLabel;
-
-    /** 更新間隔変更スライダー */
-    private JSlider speedSlider;
-
     /** トグルモードボタン */
     private JButton toggleModeButton;
 
@@ -63,6 +51,21 @@ public class ControlPanel extends JPanel {
     /** Blockモードボタン */
     private JButton blockModeButton;
 
+    /** ステータス表示ラベル */
+    private JLabel statusLabel;
+
+    /** 更新間隔表示ラベル */
+    private JLabel speedLabel;
+
+    /** 世代数表示ラベル */
+    private JLabel generationLabel;
+
+    /** 選択モードラベル */
+    private JLabel modeLabel;
+
+    /** 更新間隔変更スライダー */
+    private JSlider speedSlider;
+
     /**
      * 操作パネルを生成する。
      */
@@ -71,12 +74,17 @@ public class ControlPanel extends JPanel {
         setLayout(new BorderLayout());
 
         startButton = new JButton("Start");
+
         stopButton = new JButton("Stop");
+
         randomButton = new JButton("Random");
+
         clearButton = new JButton("Clear");
 
         toggleModeButton = new JButton("Toggle");
+
         gliderModeButton = new JButton("Glider");
+
         blockModeButton = new JButton("Block");
 
         JPanel buttonPanel = new JPanel();
@@ -89,8 +97,10 @@ public class ControlPanel extends JPanel {
         buttonPanel.add(blockModeButton);
 
         statusLabel = new JLabel("Status: Stopped");
+
+        modeLabel = new JLabel("Mode: Toggle");
+
         speedLabel = new JLabel("Speed: 200 ms");
-        generationLabel = new JLabel("Generation: 0");
 
         speedSlider = new JSlider(MIN_DELAY, MAX_DELAY, DEFAULT_DELAY);
         speedSlider.setMajorTickSpacing(MAJOR_TICK_SPACING);
@@ -98,8 +108,11 @@ public class ControlPanel extends JPanel {
         speedSlider.setPaintTicks(true);
         speedSlider.setPaintLabels(true);
 
+        generationLabel = new JLabel("Generation: 0");
+
         JPanel statusPanel = new JPanel();
         statusPanel.add(statusLabel);
+        statusPanel.add(modeLabel);
         statusPanel.add(speedLabel);
         statusPanel.add(speedSlider);
         statusPanel.add(generationLabel);
@@ -166,5 +179,14 @@ public class ControlPanel extends JPanel {
     public void updateRunningState(boolean running) {
         startButton.setEnabled(!running);
         stopButton.setEnabled(running);
+    }
+
+    /**
+     * モード表示ラベルを更新する。
+     * 
+     * @param mode 表示するモード名
+     */
+    public void updateModeLabel(String mode) {
+        modeLabel.setText("Mode: " + mode);
     }
 }
