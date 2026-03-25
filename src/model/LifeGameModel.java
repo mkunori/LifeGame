@@ -19,6 +19,9 @@ public class LifeGameModel {
     /** 世代数 */
     private int generation;
 
+    /** ランダム初期化の生存確率 */
+    private static final double DEFAULT_ALIVE_PROBABILITY = 0.3;
+
     /**
      * 指定した行数と列数でモデルを生成する。
      * 
@@ -178,7 +181,7 @@ public class LifeGameModel {
 
     /**
      * 盤面をランダムな状態で初期化する。
-     * 各セルは 30% の確率で生存状態になる。
+     * 各セルは DEFAULT_ALIVE_PROBABILITY の確率で生存状態になる。
      */
     public void randomize() {
 
@@ -186,7 +189,7 @@ public class LifeGameModel {
 
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                grid[r][c] = rand.nextDouble() < 0.3;
+                grid[r][c] = rand.nextDouble() < DEFAULT_ALIVE_PROBABILITY;
             }
         }
     }

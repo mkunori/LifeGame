@@ -1,7 +1,7 @@
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import controller.FileGameController;
+import controller.LifeGameController;
 import model.LifeGameModel;
 import view.LifeGameView;
 
@@ -9,6 +9,12 @@ import view.LifeGameView;
  * LifeGame1Go アプリケーションを起動するクラス。
  */
 public class Main {
+
+    /** 初期行数 */
+    private static final int DEFAULT_ROWS = 30;
+
+    /** 初期列数 */
+    private static final int DEFAULT_COLS = 30;
 
     /**
      * アプリケーションを起動する。
@@ -18,9 +24,9 @@ public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             // MVCインスタンスを生成する
-            LifeGameModel model = new LifeGameModel(30, 30);
+            LifeGameModel model = new LifeGameModel(DEFAULT_ROWS, DEFAULT_COLS);
             LifeGameView view = new LifeGameView(model);
-            FileGameController controller = new FileGameController(model, view);
+            LifeGameController controller = new LifeGameController(model, view);
 
             view.setController(controller);
 

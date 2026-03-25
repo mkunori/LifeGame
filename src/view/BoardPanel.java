@@ -7,7 +7,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 
-import controller.FileGameController;
+import controller.LifeGameController;
 import model.LifeGameModel;
 
 /**
@@ -20,10 +20,10 @@ public class BoardPanel extends JPanel {
     private LifeGameModel model;
 
     /** ライフゲームのコントローラ層 */
-    private FileGameController controller;
+    private LifeGameController controller;
 
     /** 盤面のグリッド1マスあたりのサイズpx */
-    private int cellSize = 20;
+    private static final int CELL_SIZE = 20;
 
     /**
      * 盤面表示用パネルを生成する。
@@ -33,8 +33,8 @@ public class BoardPanel extends JPanel {
     public BoardPanel(LifeGameModel model) {
         this.model = model;
 
-        int boardWidth = model.getCols() * cellSize;
-        int boardHeight = model.getRows() * cellSize;
+        int boardWidth = model.getCols() * CELL_SIZE;
+        int boardHeight = model.getRows() * CELL_SIZE;
 
         setPreferredSize(new Dimension(boardWidth, boardHeight));
 
@@ -43,8 +43,8 @@ public class BoardPanel extends JPanel {
             @Override
             public void mousePressed(MouseEvent e) {
 
-                int col = e.getX() / cellSize;
-                int row = e.getY() / cellSize;
+                int col = e.getX() / CELL_SIZE;
+                int row = e.getY() / CELL_SIZE;
 
                 // クリックされたセルをControllerに伝える。
                 controller.toggleCell(row, col);
@@ -57,7 +57,7 @@ public class BoardPanel extends JPanel {
      * 
      * @param controller コントローラ
      */
-    public void setController(FileGameController controller) {
+    public void setController(LifeGameController controller) {
         this.controller = controller;
     }
 
@@ -76,13 +76,13 @@ public class BoardPanel extends JPanel {
         for (int r = 0; r < model.getRows(); r++) {
             for (int c = 0; c < model.getCols(); c++) {
 
-                int x = c * cellSize;
-                int y = r * cellSize;
+                int x = c * CELL_SIZE;
+                int y = r * CELL_SIZE;
 
                 if (model.getCell(r, c)) {
-                    g.fillRect(x, y, cellSize, cellSize);
+                    g.fillRect(x, y, CELL_SIZE, CELL_SIZE);
                 } else {
-                    g.drawRect(x, y, cellSize, cellSize);
+                    g.drawRect(x, y, CELL_SIZE, CELL_SIZE);
                 }
             }
         }

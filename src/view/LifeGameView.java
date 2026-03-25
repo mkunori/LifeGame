@@ -4,7 +4,7 @@ import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
 
-import controller.FileGameController;
+import controller.LifeGameController;
 import model.LifeGameModel;
 
 /**
@@ -40,7 +40,7 @@ public class LifeGameView extends JPanel {
      * 
      * @param controller コントローラ
      */
-    public void setController(FileGameController controller) {
+    public void setController(LifeGameController controller) {
         // サブビュークラスにコントローラを渡す。
         boardPanel.setController(controller);
         controlPanel.setController(controller);

@@ -9,7 +9,7 @@ import view.LifeGameView;
  * LifeGame1Go の操作を制御するコントローラクラス。
  * モデルの更新と画面の再描画を仲介し、タイマーによる世代更新も管理する。
  */
-public class FileGameController {
+public class LifeGameController {
 
     /** 盤面状態とゲームルールを管理するモデル */
     private LifeGameModel model;
@@ -20,19 +20,27 @@ public class FileGameController {
     /** 世代更新の周期ms */
     private Timer timer;
 
+    /** スライダー初期値 */
+    private static final int DEFAULT_DELAY = 200;
+
+    /** グライダー初期位置行 */
+    private static final int GLIDER_START_ROW = 5;
+
+    /** グライダー初期位置列 */
+    private static final int GLIDER_START_COL = 5;
+
     /**
      * コントローラを生成する。
      * 
      * @param model ライフゲームの状態を管理するモデル
      * @param view 画面表示を担当するビュー
      */
-    public FileGameController(LifeGameModel model, LifeGameView view) {
+    public LifeGameController(LifeGameModel model, LifeGameView view) {
 
         this.model = model;
         this.view = view;
 
-        // 200ms ごとに 1 世代進める
-        timer = new Timer(200, e -> step());
+        timer = new Timer(DEFAULT_DELAY, e -> step());
 
         view.updateGenerationLabel(model.getGeneration());
         view.updateSpeedLabel(timer.getDelay());
@@ -105,7 +113,7 @@ public class FileGameController {
      */
     public void glider() {
 
-        model.placeGlider(5, 5);
+        model.placeGlider(GLIDER_START_ROW, GLIDER_START_COL);
 
         view.repaintBoard();
     }

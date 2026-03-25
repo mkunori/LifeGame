@@ -7,7 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 
-import controller.FileGameController;
+import controller.LifeGameController;
 
 /**
  * ライフゲームの操作部品をまとめたパネル。
@@ -42,6 +42,22 @@ public class ControlPanel extends JPanel {
     /** 更新間隔変更スライダー */
     private JSlider speedSlider;
 
+    /** スライダー最小値 */
+    private static final int MIN_DELAY = 50;
+
+    /** スライダー最大値 */
+    private static final int MAX_DELAY = 500;
+
+    /** スライダー初期値 */
+    private static final int DEFAULT_DELAY = 200;
+
+    /** 主目盛り間隔 */
+    private static final int MAJOR_TICK_SPACING = 100;
+
+    /** 補助目盛間隔 */
+    private static final int MINOR_TICK_SPACING = 50;
+
+
     /**
      * 操作パネルを生成する。
      */
@@ -66,9 +82,9 @@ public class ControlPanel extends JPanel {
         speedLabel = new JLabel("Speed: 200 ms");
         generationLabel = new JLabel("Generation: 0");
 
-        speedSlider = new JSlider(50, 500, 200);
-        speedSlider.setMajorTickSpacing(100);
-        speedSlider.setMinorTickSpacing(50);
+        speedSlider = new JSlider(MIN_DELAY, MAX_DELAY, DEFAULT_DELAY);
+        speedSlider.setMajorTickSpacing(MAJOR_TICK_SPACING);
+        speedSlider.setMinorTickSpacing(MINOR_TICK_SPACING);
         speedSlider.setPaintTicks(true);
         speedSlider.setPaintLabels(true);
 
@@ -89,7 +105,7 @@ public class ControlPanel extends JPanel {
      * 
      * @param controller コントローラ
      */
-    public void setController(FileGameController controller) {
+    public void setController(LifeGameController controller) {
 
         startButton.addActionListener(e -> controller.start());
         stopButton.addActionListener(e -> controller.stop());
