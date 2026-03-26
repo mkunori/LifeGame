@@ -259,4 +259,14 @@ public class LifeGameModel {
 
         return true;
     }
+
+    /**
+     * 指定したセルを生存状態にする。
+     * 
+     * @param row 行番号
+     * @param col 列番号
+     */
+    public void setCellAlive(int row, int col) {
+        grid[row][col] = true;
+    }
 }

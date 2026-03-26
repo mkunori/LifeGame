@@ -92,6 +92,22 @@ public class BoardPanel extends JPanel {
 
                 repaint();
             }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+
+                int col = e.getX() / CELL_SIZE;
+                int row = e.getY() / CELL_SIZE;
+
+                hoverRow = row;
+                hoverCol = col;
+
+                if (controller != null) {
+                    controller.handleBoardDrag(row, col);
+                }
+
+                repaint();
+            }
         });
     }
 
