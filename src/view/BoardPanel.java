@@ -35,8 +35,11 @@ public class BoardPanel extends JPanel {
     /** 盤面のグリッド1マスあたりのサイズpx */
     private static final int CELL_SIZE = 15;
 
-    /** プレビュー表示用のカラー */
+    /** プレビュー表示用のカラー(置ける) */
     private static final Color PREVIEW_COLOR = new Color(0, 0, 255, 80);
+
+    /** プレビュー表示用のカラー(置けない) */
+    private static final Color PREVIEW_ERROR_COLOR = new Color(255, 0, 0, 80);
 
     /**
      * 盤面表示用パネルを生成する。
@@ -173,7 +176,12 @@ public class BoardPanel extends JPanel {
         }
 
         Graphics2D g2 = (Graphics2D) g.create();
-        g2.setColor(PREVIEW_COLOR);
+
+        if (hoverRow < model.getRows() && hoverCol < model.getCols()) {
+            g2.setColor(PREVIEW_COLOR);
+        } else {
+            g2.setColor(PREVIEW_ERROR_COLOR);
+        }
 
         int x = hoverCol * CELL_SIZE;
         int y = hoverRow * CELL_SIZE;
@@ -193,7 +201,14 @@ public class BoardPanel extends JPanel {
         int[][] cells = patternType.getCells();
 
         Graphics2D g2 = (Graphics2D) g.create();
-        g2.setColor(PREVIEW_COLOR);
+
+        boolean canPlace = canPlacePattern(patternType);
+
+        if (canPlace) {
+            g2.setColor(PREVIEW_COLOR);
+        } else {
+            g2.setColor(PREVIEW_ERROR_COLOR);
+        }
 
         for (int[] cell : cells) {
             int row = hoverRow + cell[0];
@@ -210,5 +225,27 @@ public class BoardPanel extends JPanel {
         }
 
         g2.dispose();
+    }
+
+    /**
+     * 指定した位置にパターンを配置できるか判定する。
+     * 
+     * @param patternType 判定するパターン
+     * @return 配置可能なら true
+     */
+    private boolean canPlacePattern(PatternType patternType) {
+
+        int[][] cells = patternType.getCells();
+
+        for (int[] cell : cells) {
+            int row = hoverRow + cell[0];
+            int col = hoverCol + cell[1];
+
+            if (row < 0 || row >= model.getRows() || col < 0 || col >= model.getCols()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
