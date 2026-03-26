@@ -16,6 +16,7 @@ Java と Swing で作成したライフゲームアプリです。
 ## ■ 主な機能
 
 - セルのクリックによる ON / OFF 切り替え
+- ドラッグによるセル描画（Toggleモード）
 - 世代の自動更新（Start / Stop）
 - ランダム配置（Random）
 - 全消去（Clear）
@@ -24,11 +25,21 @@ Java と Swing で作成したライフゲームアプリです。
 - 状態表示（Running / Stopped）
 - Start / Stop ボタンの有効・無効制御
 - モード選択用プルダウン
-- パターン配置
-  - Glider
-  - Block
-  - Blinker
-  - Gosper Glider Gun
+
+### パターン配置
+
+- Glider
+- Block
+- Blinker
+- Toad
+- Beacon
+- Gosper Glider Gun
+
+### プレビュー機能
+
+- マウス位置にパターンの仮配置を表示
+- 配置可能な場合：半透明表示
+- 配置不可な場合：赤色表示
 
 ---
 
@@ -36,6 +47,9 @@ Java と Swing で作成したライフゲームアプリです。
 
 - 盤面クリック  
   現在のモードに応じてセルの反転またはパターン配置を行います
+
+- ドラッグ（Toggleモード）  
+  通過したセルを1回ずつ反転します
 
 - Start  
   シミュレーションを開始します
@@ -58,6 +72,8 @@ Java と Swing で作成したライフゲームアプリです。
   - Glider
   - Block
   - Blinker
+  - Toad
+  - Beacon
   - Gosper Glider Gun
 
 ---
@@ -91,7 +107,7 @@ view
 
 ---
 
-## ■ クラス図（Mermaid）
+## ■ クラス図
 
 ```mermaid
 classDiagram
@@ -118,6 +134,75 @@ classDiagram
     ControlPanel --> ClickMode : selects
 
     LifeGameModel --> PatternType : uses pattern data
+```
+
+---
+
+## ■ シーケンス図
+
+### 盤面クリック時の処理
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant BoardPanel
+    participant LifeGameController
+    participant LifeGameModel
+    participant LifeGameView
+
+    User->>BoardPanel: 盤面をクリック
+    BoardPanel->>LifeGameController: handleBoardClick(row, col)
+    LifeGameController->>LifeGameController: 現在の ClickMode を確認
+
+    alt Toggle モード
+        LifeGameController->>LifeGameModel: toggleCell(row, col)
+    else パターン配置モード
+        LifeGameController->>LifeGameModel: placePattern(patternType, row, col)
+    end
+
+    LifeGameController->>LifeGameView: repaintBoard()
+```
+
+### Startして1世代進むときの処理
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant ControlPanel
+    participant LifeGameController
+    participant Timer
+    participant LifeGameModel
+    participant LifeGameView
+
+    User->>ControlPanel: Start ボタン押下
+    ControlPanel->>LifeGameController: start()
+    LifeGameController->>Timer: start()
+
+    Timer->>LifeGameController: step()
+    LifeGameController->>LifeGameModel: nextGeneration()
+    LifeGameController->>LifeGameModel: incrementGeneration()
+    LifeGameController->>LifeGameView: updateGenerationLabel()
+    LifeGameController->>LifeGameView: repaintBoard()
+```
+
+### プレビュー表示時の処理
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant BoardPanel
+    participant LifeGameController
+    participant ClickMode
+    participant PatternType
+
+    User->>BoardPanel: マウス移動
+    BoardPanel->>BoardPanel: hoverRow / hoverCol を更新
+    BoardPanel->>LifeGameController: getClickMode()
+    LifeGameController-->>BoardPanel: ClickMode
+    BoardPanel->>ClickMode: getPatternType()
+    ClickMode-->>BoardPanel: PatternType
+    BoardPanel->>PatternType: getCells()
+    BoardPanel->>BoardPanel: プレビューを描画
 ```
 
 ---
@@ -175,21 +260,13 @@ classDiagram
 - enum を使った状態管理
 - 定数化による可読性向上
 - パターンデータと配置処理の分離
+- プレビュー描画（描画と状態の分離）
 
 ---
 
 ## ■ 今後の追加予定
 
-- パターン配置時のプレビュー表示
-  - マウスカーソル位置に仮配置を表示する
-- ドラッグによるセル描画
 - ループ検出や停止条件の強化
-- README へのスクリーンショット追加
-- クラス図の継続的な更新
-- パターンの追加
-  - Toad
-  - Beacon
-  - そのほかの代表パターン
 - 保存 / 読み込み機能
 
 ---
