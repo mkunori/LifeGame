@@ -13,8 +13,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import controller.ClickMode;
-import controller.LifeGameController;
-import model.LifeGameModel;
+import controller.LGController;
+import model.LGModel;
 import model.PatternType;
 
 /**
@@ -24,10 +24,10 @@ import model.PatternType;
 public class BoardPanel extends JPanel {
 
     /** ライフゲームのモデル層 */
-    private LifeGameModel model;
+    private LGModel model;
 
     /** ライフゲームのコントローラ層 */
-    private LifeGameController controller;
+    private LGController controller;
 
     /** マウスの現在位置の行 (セル単位) */
     private int hoverRow = -1;
@@ -52,7 +52,7 @@ public class BoardPanel extends JPanel {
      * 
      * @param model 描画対象のモデル
      */
-    public BoardPanel(LifeGameModel model) {
+    public BoardPanel(LGModel model) {
 
         this.model = model;
 
@@ -131,7 +131,7 @@ public class BoardPanel extends JPanel {
      * 
      * @param controller コントローラ
      */
-    public void setController(LifeGameController controller) {
+    public void setController(LGController controller) {
         this.controller = controller;
     }
 

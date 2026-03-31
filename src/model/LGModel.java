@@ -3,9 +3,9 @@ package model;
 import java.util.Random;
 
 /**
- * LifeGame1Go の盤面状態とゲームルールを管理するモデルクラス。
+ * LifeGameの盤面状態とゲームルールを管理するモデルクラス。
  */
-public class LifeGameModel {
+public class LGModel {
 
     /** ランダム初期化の生存確率 */
     private static final double DEFAULT_ALIVE_PROBABILITY = 0.3;
@@ -28,7 +28,7 @@ public class LifeGameModel {
      * @param rows 盤面の行数
      * @param cols 盤面の列数
      */
-    public LifeGameModel(int rows, int cols) {
+    public LGModel(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
 

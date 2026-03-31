@@ -2,15 +2,15 @@ package controller;
 
 import javax.swing.Timer;
 
-import model.LifeGameModel;
+import model.LGModel;
 import model.PatternType;
-import view.LifeGameView;
+import view.LGView;
 
 /**
- * LifeGame1Go の操作を制御するコントローラクラス。
+ * LifeGameの操作を制御するコントローラクラス。
  * モデルの更新と画面の再描画を仲介し、タイマーによる世代更新も管理する。
  */
-public class LifeGameController {
+public class LGController {
 
     /** スライダー初期値 */
     private static final int DEFAULT_DELAY = 200;
@@ -19,10 +19,10 @@ public class LifeGameController {
     private ClickMode clickMode = ClickMode.TOGGLE;
 
     /** 盤面状態とゲームルールを管理するモデル */
-    private LifeGameModel model;
+    private LGModel model;
 
     /** 画面全体を表すビュー */
-    private LifeGameView view;
+    private LGView view;
 
     /** 世代更新の周期ms */
     private Timer timer;
@@ -33,7 +33,7 @@ public class LifeGameController {
      * @param model ライフゲームの状態を管理するモデル
      * @param view  画面表示を担当するビュー
      */
-    public LifeGameController(LifeGameModel model, LifeGameView view) {
+    public LGController(LGModel model, LGView view) {
 
         this.model = model;
         this.view = view;

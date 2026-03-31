@@ -1,14 +1,14 @@
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import controller.LifeGameController;
-import model.LifeGameModel;
-import view.LifeGameView;
+import controller.LGController;
+import model.LGModel;
+import view.LGView;
 
 /**
- * LifeGame1Go アプリケーションを起動するクラス。
+ * LifeGameアプリケーションを起動するクラス。
  */
-public class Main {
+public class LGMain {
 
     /** 初期行数 */
     private static final int DEFAULT_ROWS = 50;
@@ -24,14 +24,14 @@ public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             // MVCインスタンスを生成する
-            LifeGameModel model = new LifeGameModel(DEFAULT_ROWS, DEFAULT_COLS);
-            LifeGameView view = new LifeGameView(model);
-            LifeGameController controller = new LifeGameController(model, view);
+            LGModel model = new LGModel(DEFAULT_ROWS, DEFAULT_COLS);
+            LGView view = new LGView(model);
+            LGController controller = new LGController(model, view);
 
             view.setController(controller);
 
             // 起動する
-            JFrame frame = new JFrame("LifeGame1Go");
+            JFrame frame = new JFrame("LifeGame");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.add(view);
             frame.pack();

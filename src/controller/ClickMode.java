@@ -59,7 +59,7 @@ public enum ClickMode {
      * 
      * @param controller コントローラ
      */
-    public void apply(LifeGameController controller) {
+    public void apply(LGController controller) {
         switch (this) {
             case TOGGLE -> controller.setToggleMode();
             case GLIDER -> controller.setGliderMode();

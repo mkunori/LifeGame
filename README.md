@@ -1,4 +1,4 @@
-# LifeGame1Go
+# LifeGame
 
 Swingで開発したライフゲームアプリです。  
 マウス操作でセルの状態を切り替えたり、各種パターンを配置したりしながら、世代ごとの変化を視覚的に確認できます。  
@@ -74,20 +74,20 @@ Swingで開発したライフゲームアプリです。
 ## ■ パッケージ構成
 
 ```text
-Main                         // アプリケーションのエントリーポイント
+LGMain            // アプリケーションのエントリーポイント
 
 controller
-├─ LifeGameController        // 入力制御、タイマー管理、状態更新
-└─ ClickMode                 // 盤面クリック時の動作モード
+├─ LGController   // 入力制御、タイマー管理、状態更新
+└─ ClickMode      // 盤面クリック時の動作モード
 
 model
-├─ LifeGameModel             // ライフゲームの状態管理と更新処理
-└─ PatternType               // パターン定義と表示名
+├─ LGModel        // ライフゲームの状態管理と更新処理
+└─ PatternType    // パターン定義と表示名
 
 view
-├─ LifeGameView              // 画面全体の構成
-├─ BoardPanel                // 盤面描画とマウス入力
-└─ ControlPanel              // 操作UI（ボタン、スライダー、プルダウン、表示ラベル）
+├─ LGView         // 画面全体の構成
+├─ BoardPanel     // 盤面描画とマウス入力
+└─ ControlPanel   // 操作UI（ボタン、スライダー、プルダウン、表示ラベル）
 ```
 
 ---
@@ -96,29 +96,29 @@ view
 
 ```mermaid
 classDiagram
-    class LifeGameController
-    class LifeGameModel
-    class LifeGameView
+    class LGController
+    class LGModel
+    class LGView
     class BoardPanel
     class ControlPanel
     class ClickMode
     class PatternType
 
-    LifeGameController --> LifeGameModel : updates
-    LifeGameController --> LifeGameView : updates UI
-    LifeGameController --> ClickMode : manages
-    LifeGameController --> PatternType : selects
+    LGController --> LGModel : updates
+    LGController --> LGView : updates UI
+    LGController --> ClickMode : manages
+    LGController --> PatternType : selects
 
-    LifeGameView --> BoardPanel : contains
-    LifeGameView --> ControlPanel : contains
+    LGView --> BoardPanel : contains
+    LGView --> ControlPanel : contains
 
-    BoardPanel --> LifeGameModel : reads
-    BoardPanel --> LifeGameController : notifies click
+    BoardPanel --> LGModel : reads
+    BoardPanel --> LGController : notifies click
 
-    ControlPanel --> LifeGameController : sends events
+    ControlPanel --> LGController : sends events
     ControlPanel --> ClickMode : selects
 
-    LifeGameModel --> PatternType : uses pattern data
+    LGModel --> PatternType : uses pattern data
 ```
 
 ---
@@ -129,21 +129,21 @@ classDiagram
 sequenceDiagram
     participant User
     participant BoardPanel
-    participant LifeGameController
-    participant LifeGameModel
-    participant LifeGameView
+    participant LGController
+    participant LGModel
+    participant LGView
 
     User->>BoardPanel: 盤面をクリック
-    BoardPanel->>LifeGameController: handleBoardClick(row, col)
-    LifeGameController->>LifeGameController: 現在の ClickMode を確認
+    BoardPanel->>LGController: handleBoardClick(row, col)
+    LGController->>LGController: 現在の ClickMode を確認
 
     alt Toggle モード
-        LifeGameController->>LifeGameModel: toggleCell(row, col)
+        LGController->>LGModel: toggleCell(row, col)
     else パターン配置モード
-        LifeGameController->>LifeGameModel: placePattern(patternType, row, col)
+        LGController->>LGModel: placePattern(patternType, row, col)
     end
 
-    LifeGameController->>LifeGameView: repaintBoard()
+    LGController->>LGView: repaintBoard()
 ```
 
 ---
@@ -154,20 +154,20 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant ControlPanel
-    participant LifeGameController
+    participant LGController
     participant Timer
-    participant LifeGameModel
-    participant LifeGameView
+    participant LGModel
+    participant LGView
 
     User->>ControlPanel: Start ボタン押下
-    ControlPanel->>LifeGameController: start()
-    LifeGameController->>Timer: start()
+    ControlPanel->>LGController: start()
+    LGController->>Timer: start()
 
-    Timer->>LifeGameController: step()
-    LifeGameController->>LifeGameModel: nextGeneration()
-    LifeGameController->>LifeGameModel: incrementGeneration()
-    LifeGameController->>LifeGameView: updateGenerationLabel()
-    LifeGameController->>LifeGameView: repaintBoard()
+    Timer->>LGController: step()
+    LGController->>LGModel: nextGeneration()
+    LGController->>LGModel: incrementGeneration()
+    LGController->>LGView: updateGenerationLabel()
+    LGController->>LGView: repaintBoard()
 ```
 
 ---
@@ -178,14 +178,14 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant BoardPanel
-    participant LifeGameController
+    participant LGController
     participant ClickMode
     participant PatternType
 
     User->>BoardPanel: マウス移動
     BoardPanel->>BoardPanel: hoverRow / hoverCol を更新
-    BoardPanel->>LifeGameController: getClickMode()
-    LifeGameController-->>BoardPanel: ClickMode
+    BoardPanel->>LGController: getClickMode()
+    LGController-->>BoardPanel: ClickMode
     BoardPanel->>ClickMode: getPatternType()
     ClickMode-->>BoardPanel: PatternType
     BoardPanel->>PatternType: getCells()
