@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 /**
  * ライフゲームの処理を担当するサービスクラスです。
  *
- * Controllerから呼び出され、盤面データを用意します。
- * 今後は、世代更新やセル切り替えなどの処理もこのクラスから呼び出します。
+ * Controllerから呼び出され、盤面データの取得や更新を行います。
+ * 画面から直接Modelを操作させず、Serviceを通して処理する構成にしています。
  */
 @Service
 public class LifeGameService {
@@ -21,5 +21,12 @@ public class LifeGameService {
      */
     public LifeGameBoard getBoard() {
         return board;
+    }
+
+    /**
+     * 盤面を1世代進めます。
+     */
+    public void nextGeneration() {
+        board.nextGeneration();
     }
 }

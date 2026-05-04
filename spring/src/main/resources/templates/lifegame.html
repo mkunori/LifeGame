@@ -7,13 +7,24 @@
     <!-- ブラウザのタブに表示されるタイトルです -->
     <title>LifeGame Spring</title>
 
-    <!-- 後で作成するCSSファイルを読み込みます -->
+    <!-- static/css/lifegame.css を読み込みます -->
     <link rel="stylesheet" th:href="@{/css/lifegame.css}">
 </head>
 
 <body>
     <!-- 画面の見出しです -->
     <h1>LifeGame Spring</h1>
+
+    <!-- 操作用のボタンをまとめる領域です -->
+    <div class="controls">
+        <!--
+            Stepボタンです。
+            ボタンを押すと POST /lifegame/step にリクエストを送ります。
+        -->
+        <form th:action="@{/lifegame/step}" method="post">
+            <button type="submit">Step</button>
+        </form>
+    </div>
 
     <!-- 盤面サイズの確認表示です -->
     <p>

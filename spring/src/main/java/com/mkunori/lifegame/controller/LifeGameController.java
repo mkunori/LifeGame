@@ -4,11 +4,13 @@ import com.mkunori.lifegame.service.LifeGameService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 /**
  * ライフゲーム画面を表示するためのコントローラーです。
  *
  * ブラウザからのリクエストを受け取り、表示に必要なデータをHTMLテンプレートへ渡します。
+ * また、Stepボタンなどの操作リクエストを受け取り、Serviceへ処理を依頼します。
  */
 @Controller
 public class LifeGameController {
@@ -38,5 +40,19 @@ public class LifeGameController {
     public String showLifeGame(Model model) {
         model.addAttribute("board", lifeGameService.getBoard());
         return "lifegame";
+    }
+
+    /**
+     * 盤面を1世代進めます。
+     *
+     * StepボタンからPOSTリクエストを受け取り、Serviceに盤面更新を依頼します。
+     * 更新後はライフゲーム画面へリダイレクトします。
+     *
+     * @return リダイレクト先
+     */
+    @PostMapping("/lifegame/step")
+    public String step() {
+        lifeGameService.nextGeneration();
+        return "redirect:/lifegame";
     }
 }

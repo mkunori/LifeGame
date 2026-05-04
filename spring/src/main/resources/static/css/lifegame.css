@@ -10,6 +10,18 @@ h1 {
     margin-bottom: 12px;
 }
 
+/* 操作用ボタンを置く領域です */
+.controls {
+    margin-bottom: 16px;
+}
+
+/* ボタンの基本的な見た目を設定します */
+button {
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
 /* 盤面全体を囲む領域です */
 .board {
     display: inline-block;
