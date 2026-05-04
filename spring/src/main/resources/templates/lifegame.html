@@ -1,15 +1,38 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
+
+    <!-- ブラウザのタブに表示されるタイトルです -->
     <title>LifeGame Spring</title>
+
+    <!-- 後で作成するCSSファイルを読み込みます -->
+    <link rel="stylesheet" th:href="@{/css/lifegame.css}">
 </head>
 
 <body>
+    <!-- 画面の見出しです -->
     <h1>LifeGame Spring</h1>
 
-    <p>Spring Boot版ライフゲームの最初の画面です。</p>
+    <!-- 盤面サイズの確認表示です -->
+    <p>
+        Board size:
+        <span th:text="${board.rows}">0</span>
+        x
+        <span th:text="${board.cols}">0</span>
+    </p>
+
+    <!-- ライフゲームの盤面を表示する領域です -->
+    <div class="board">
+        <!-- board.cells の1行ずつを row として取り出します -->
+        <div class="board-row" th:each="row : ${board.cells}">
+
+            <!-- row の中の1セルずつを cell として取り出します -->
+            <div class="cell" th:each="cell : ${row}" th:classappend="${cell} ? ' alive' : ' dead'">
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

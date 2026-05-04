@@ -1,0 +1,42 @@
+/* ページ全体の基本的な見た目を設定します */
+body {
+    margin: 24px;
+    font-family: sans-serif;
+    background-color: #f5f5f5;
+}
+
+/* 見出しの下に少し余白を作ります */
+h1 {
+    margin-bottom: 12px;
+}
+
+/* 盤面全体を囲む領域です */
+.board {
+    display: inline-block;
+    padding: 8px;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+}
+
+/* 盤面の1行分です */
+.board-row {
+    display: flex;
+}
+
+/* 盤面の1セル分です */
+.cell {
+    width: 14px;
+    height: 14px;
+    border: 1px solid #dddddd;
+    box-sizing: border-box;
+}
+
+/* 生きているセルの見た目です */
+.cell.alive {
+    background-color: #333333;
+}
+
+/* 死んでいるセルの見た目です */
+.cell.dead {
+    background-color: #ffffff;
+}
