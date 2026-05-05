@@ -24,6 +24,22 @@
         <form th:action="@{/lifegame/step}" method="post">
             <button type="submit">Step</button>
         </form>
+
+        <!--
+            Clearボタンです。
+            ボタンを押すと POST /lifegame/clear にリクエストを送ります。
+        -->
+        <form th:action="@{/lifegame/clear}" method="post">
+            <button type="submit">Clear</button>
+        </form>
+
+        <!--
+            Randomボタンです。
+            ボタンを押すと POST /lifegame/random にリクエストを送ります。
+        -->
+        <form th:action="@{/lifegame/random}" method="post">
+            <button type="submit">Random</button>
+        </form>
     </div>
 
     <!-- 盤面サイズの確認表示です -->

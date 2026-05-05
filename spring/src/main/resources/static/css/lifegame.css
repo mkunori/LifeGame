@@ -12,6 +12,8 @@ h1 {
 
 /* 操作用ボタンを置く領域です */
 .controls {
+    display: flex;
+    gap: 8px;
     margin-bottom: 16px;
 }
 

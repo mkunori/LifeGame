@@ -55,4 +55,32 @@ public class LifeGameController {
         lifeGameService.nextGeneration();
         return "redirect:/lifegame";
     }
+
+    /**
+     * 盤面をすべてクリアします。
+     *
+     * ClearボタンからPOSTリクエストを受け取り、Serviceに盤面クリアを依頼します。
+     * 更新後はライフゲーム画面へリダイレクトします。
+     *
+     * @return リダイレクト先
+     */
+    @PostMapping("/lifegame/clear")
+    public String clear() {
+        lifeGameService.clear();
+        return "redirect:/lifegame";
+    }
+
+    /**
+     * 盤面をランダムに配置します。
+     *
+     * RandomボタンからPOSTリクエストを受け取り、Serviceにランダム配置を依頼します。
+     * 更新後はライフゲーム画面へリダイレクトします。
+     *
+     * @return リダイレクト先
+     */
+    @PostMapping("/lifegame/random")
+    public String randomize() {
+        lifeGameService.randomize();
+        return "redirect:/lifegame";
+    }
 }

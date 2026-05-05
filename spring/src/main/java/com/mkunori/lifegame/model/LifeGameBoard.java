@@ -1,5 +1,7 @@
 package com.mkunori.lifegame.model;
 
+import java.util.Random;
+
 /**
  * ライフゲームの盤面を表すクラスです。
  *
@@ -11,6 +13,7 @@ public class LifeGameBoard {
     private final int rows;
     private final int cols;
     private boolean[][] cells;
+    private final Random random = new Random();
 
     /**
      * 指定された行数と列数で盤面を作成します。
@@ -85,6 +88,26 @@ public class LifeGameBoard {
         }
 
         cells = nextCells;
+    }
+
+    /**
+     * 盤面上のすべてのセルを死んだ状態にします。
+     */
+    public void clear() {
+        cells = new boolean[rows][cols];
+    }
+
+    /**
+     * 盤面上のセルをランダムに生きた状態または死んだ状態にします。
+     *
+     * 現在は、およそ4分の1の確率でセルが生きるようにしています。
+     */
+    public void randomize() {
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                cells[row][col] = random.nextInt(4) == 0;
+            }
+        }
     }
 
     /**

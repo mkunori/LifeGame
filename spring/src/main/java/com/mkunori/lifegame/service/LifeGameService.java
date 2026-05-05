@@ -29,4 +29,18 @@ public class LifeGameService {
     public void nextGeneration() {
         board.nextGeneration();
     }
+
+    /**
+     * 盤面上のすべてのセルを死んだ状態にします。
+     */
+    public void clear() {
+        board.clear();
+    }
+
+    /**
+     * 盤面上のセルをランダムに生きた状態または死んだ状態にします。
+     */
+    public void randomize() {
+        board.randomize();
+    }
 }
