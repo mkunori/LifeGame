@@ -1,6 +1,7 @@
 package com.mkunori.lifegame.service;
 
 import com.mkunori.lifegame.model.LifeGameBoard;
+import com.mkunori.lifegame.model.PatternType;
 import org.springframework.stereotype.Service;
 
 /**
@@ -59,5 +60,14 @@ public class LifeGameService {
      */
     public void toggleCell(int row, int col) {
         board.toggleCell(row, col);
+    }
+
+    /**
+     * 指定されたパターンを盤面中央に配置します。
+     *
+     * @param patternType 配置するパターンの種類
+     */
+    public void placePattern(PatternType patternType) {
+        board.placePattern(patternType);
     }
 }

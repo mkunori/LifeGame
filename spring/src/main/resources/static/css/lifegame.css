@@ -24,6 +24,24 @@ h1 {
     cursor: pointer;
 }
 
+/* パターン配置フォームを置く領域です */
+.pattern-controls {
+    margin-bottom: 16px;
+}
+
+/* パターン配置フォーム内の要素を横並びにします */
+.pattern-controls form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* パターン選択用のセレクトボックスです */
+select {
+    padding: 8px;
+    font-size: 16px;
+}
+
 /* 盤面の状態表示をまとめる領域です */
 .status {
     margin-bottom: 16px;

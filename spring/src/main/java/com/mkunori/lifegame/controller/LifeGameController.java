@@ -1,5 +1,6 @@
 package com.mkunori.lifegame.controller;
 
+import com.mkunori.lifegame.model.PatternType;
 import com.mkunori.lifegame.service.LifeGameService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,7 +33,8 @@ public class LifeGameController {
     /**
      * ライフゲーム画面を表示します。
      *
-     * Modelに盤面データを入れることで、HTMLテンプレート側から盤面を参照できるようにします。
+     * Modelに盤面データとパターン選択肢を入れることで、
+     * HTMLテンプレート側から盤面や選択肢を参照できるようにします。
      *
      * @param model HTMLテンプレートへ渡すデータを入れるための入れ物
      * @return 表示するテンプレート名
@@ -40,6 +42,7 @@ public class LifeGameController {
     @GetMapping("/lifegame")
     public String showLifeGame(Model model) {
         model.addAttribute("board", lifeGameService.getBoard());
+        model.addAttribute("patternTypes", PatternType.values());
         return "lifegame";
     }
 
@@ -112,6 +115,21 @@ public class LifeGameController {
     @PostMapping("/lifegame/toggle")
     public String toggle(@RequestParam int row, @RequestParam int col) {
         lifeGameService.toggleCell(row, col);
+        return "redirect:/lifegame";
+    }
+
+    /**
+     * 選択されたパターンを盤面中央に配置します。
+     *
+     * Pattern選択フォームからPOSTリクエストを受け取り、Serviceにパターン配置を依頼します。
+     * 更新後はライフゲーム画面へリダイレクトします。
+     *
+     * @param patternType 配置するパターンの種類
+     * @return リダイレクト先
+     */
+    @PostMapping("/lifegame/pattern")
+    public String placePattern(@RequestParam PatternType patternType) {
+        lifeGameService.placePattern(patternType);
         return "redirect:/lifegame";
     }
 }

@@ -154,6 +154,53 @@ public class LifeGameBoard {
     }
 
     /**
+     * 指定されたパターンを盤面中央に配置します。
+     *
+     * 配置前に盤面をクリアし、選択されたパターンだけを表示します。
+     * 世代数も0に戻します。
+     *
+     * @param patternType 配置するパターンの種類
+     */
+    public void placePattern(PatternType patternType) {
+        clear();
+
+        int baseRow = rows / 2;
+        int baseCol = cols / 2;
+
+        switch (patternType) {
+            case BLINKER -> placeCells(
+                    new int[][] {
+                            { 0, -1 },
+                            { 0, 0 },
+                            { 0, 1 }
+                    },
+                    baseRow,
+                    baseCol);
+
+            case BLOCK -> placeCells(
+                    new int[][] {
+                            { 0, 0 },
+                            { 0, 1 },
+                            { 1, 0 },
+                            { 1, 1 }
+                    },
+                    baseRow,
+                    baseCol);
+
+            case GLIDER -> placeCells(
+                    new int[][] {
+                            { 0, 1 },
+                            { 1, 2 },
+                            { 2, 0 },
+                            { 2, 1 },
+                            { 2, 2 }
+                    },
+                    baseRow,
+                    baseCol);
+        }
+    }
+
+    /**
      * 指定されたセルの周囲にある生きたセルの数を数えます。
      *
      * ライフゲームでは、上下左右と斜めを含む8方向のセルを隣接セルとして扱います。
@@ -192,6 +239,27 @@ public class LifeGameBoard {
      */
     private boolean isInside(int row, int col) {
         return 0 <= row && row < rows && 0 <= col && col < cols;
+    }
+
+    /**
+     * 基準位置からの相対座標をもとに、複数のセルを生きた状態にします。
+     *
+     * offsetsには、基準位置から見た行方向・列方向のずれを指定します。
+     * 盤面の外側になるセルは無視します。
+     *
+     * @param offsets 配置するセルの相対座標
+     * @param baseRow 基準にする行番号
+     * @param baseCol 基準にする列番号
+     */
+    private void placeCells(int[][] offsets, int baseRow, int baseCol) {
+        for (int[] offset : offsets) {
+            int row = baseRow + offset[0];
+            int col = baseCol + offset[1];
+
+            if (isInside(row, col)) {
+                cells[row][col] = true;
+            }
+        }
     }
 
     /**

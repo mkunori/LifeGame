@@ -50,6 +50,36 @@
         </form>
     </div>
 
+    <!-- パターン配置用のフォームです -->
+    <div class="pattern-controls">
+        <!--
+            選択したパターンをPOST /lifegame/patternへ送ります。
+            patternTypeという名前でControllerに渡されます。
+        -->
+        <form th:action="@{/lifegame/pattern}" method="post">
+            <!-- パターン選択用のラベルです -->
+            <label for="patternType">Pattern:</label>
+
+            <!--
+                パターンを選ぶセレクトボックスです。
+                patternTypesはControllerから渡されたPatternType.values()です。
+            -->
+            <select id="patternType" name="patternType">
+                <!--
+                    patternTypesから1つずつpatternを取り出します。
+                    valueにはenum名、表示にはdisplayNameを使います。
+                -->
+                <option th:each="pattern : ${patternTypes}" th:value="${pattern.name()}"
+                    th:text="${pattern.displayName}">
+                    Pattern
+                </option>
+            </select>
+
+            <!-- 選択したパターンを中央に配置するボタンです -->
+            <button type="submit" class="control-button">Place</button>
+        </form>
+    </div>
+
     <!-- 盤面の状態を表示する領域です -->
     <div class="status">
         <!-- 現在の世代数を表示します -->
