@@ -20,7 +20,22 @@ public enum PatternType {
     /**
      * 斜め方向へ移動していく代表的なパターンです。
      */
-    GLIDER("Glider");
+    GLIDER("Glider"),
+
+    /**
+     * 6つのセルで構成される振動子パターンです。
+     */
+    TOAD("Toad"),
+
+    /**
+     * 2つのブロックが斜めに重なったような振動子パターンです。
+     */
+    BEACON("Beacon"),
+
+    /**
+     * グライダーを周期的に発射する有名な大型パターンです。
+     */
+    GOSPER_GLIDER_GUN("Gosper Glider Gun");
 
     private final String displayName;
 
