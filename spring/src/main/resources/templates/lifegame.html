@@ -69,34 +69,30 @@
         <span id="speedValue">300 ms</span>
     </div>
 
-    <!-- パターン配置用のフォームです -->
+    <!-- パターン配置用の操作領域です -->
     <div class="pattern-controls">
+        <!-- パターン選択用のラベルです -->
+        <label for="patternType">Pattern:</label>
+
         <!--
-            選択したパターンをPOST /lifegame/patternへ送ります。
-            patternTypeという名前でControllerに渡されます。
+            パターンを選ぶセレクトボックスです。
+            patternTypesはControllerから渡されたPatternType.values()です。
         -->
-        <form th:action="@{/lifegame/pattern}" method="post">
-            <!-- パターン選択用のラベルです -->
-            <label for="patternType">Pattern:</label>
-
+        <select id="patternType" name="patternType">
             <!--
-                パターンを選ぶセレクトボックスです。
-                patternTypesはControllerから渡されたPatternType.values()です。
+                patternTypesから1つずつpatternを取り出します。
+                valueにはenum名、表示にはdisplayNameを使います。
             -->
-            <select id="patternType" name="patternType">
-                <!--
-                    patternTypesから1つずつpatternを取り出します。
-                    valueにはenum名、表示にはdisplayNameを使います。
-                -->
-                <option th:each="pattern : ${patternTypes}" th:value="${pattern.name()}"
-                    th:text="${pattern.displayName}">
-                    Pattern
-                </option>
-            </select>
+            <option th:each="pattern : ${patternTypes}" th:value="${pattern.name()}" th:text="${pattern.displayName}">
+                Pattern
+            </option>
+        </select>
 
-            <!-- 選択したパターンを中央に配置するボタンです -->
-            <button type="submit" class="control-button">Place</button>
-        </form>
+        <!--
+            選択したパターンを中央に配置するボタンです。
+            JavaScriptでAPIを呼び出し、画面を再読み込みせずに配置します。
+        -->
+        <button type="button" id="placePatternButton" class="control-button">Place</button>
     </div>
 
     <!-- 盤面の状態を表示する領域です -->

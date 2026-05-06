@@ -49,21 +49,6 @@ public class LifeGameController {
     }
 
     /**
-     * 選択されたパターンを盤面中央に配置します。
-     *
-     * Pattern選択フォームからPOSTリクエストを受け取り、Serviceにパターン配置を依頼します。
-     * 更新後はライフゲーム画面へリダイレクトします。
-     *
-     * @param patternType 配置するパターンの種類
-     * @return リダイレクト先
-     */
-    @PostMapping("/lifegame/pattern")
-    public String placePattern(@RequestParam PatternType patternType) {
-        lifeGameService.placePattern(patternType);
-        return "redirect:/lifegame";
-    }
-
-    /**
      * 盤面を1世代進めて、更新後の盤面データを返します。
      *
      * JavaScriptの自動再生処理から呼び出されます。
@@ -137,6 +122,22 @@ public class LifeGameController {
     @ResponseBody
     public LifeGameBoard toggleApi(@RequestParam int row, @RequestParam int col) {
         lifeGameService.toggleCell(row, col);
+        return lifeGameService.getBoard();
+    }
+
+    /**
+     * 選択されたパターンを盤面中央に配置して、更新後の盤面データを返します。
+     *
+     * JavaScriptから呼び出されます。
+     * patternTypeで指定されたパターンを配置し、JSON形式で現在の盤面を返します。
+     *
+     * @param patternType 配置するパターンの種類
+     * @return 更新後のライフゲーム盤面
+     */
+    @PostMapping("/lifegame/api/pattern")
+    @ResponseBody
+    public LifeGameBoard placePatternApi(@RequestParam PatternType patternType) {
+        lifeGameService.placePattern(patternType);
         return lifeGameService.getBoard();
     }
 }

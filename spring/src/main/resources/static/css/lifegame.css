@@ -49,11 +49,12 @@ h1 {
     margin-bottom: 16px;
 }
 
-/* パターン配置フォーム内の要素を横並びにします */
-.pattern-controls form {
+/* パターン配置の操作部品を横並びにします */
+.pattern-controls {
     display: flex;
     align-items: center;
     gap: 8px;
+    margin-bottom: 16px;
 }
 
 /* パターン選択用のセレクトボックスです */

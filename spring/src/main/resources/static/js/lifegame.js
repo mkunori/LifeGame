@@ -24,6 +24,12 @@ const resetButton = document.getElementById("resetButton");
 // Randomボタンを取得します。
 const randomButton = document.getElementById("randomButton");
 
+// パターン選択用のセレクトボックスを取得します。
+const patternTypeSelect = document.getElementById("patternType");
+
+// パターン配置ボタンを取得します。
+const placePatternButton = document.getElementById("placePatternButton");
+
 // 盤面上のセルボタンをすべて取得します。
 const cellButtons = document.querySelectorAll(".cell");
 
@@ -64,6 +70,11 @@ resetButton.addEventListener("click", () => {
 // Randomボタンが押されたとき、APIを呼び出してランダム配置します。
 randomButton.addEventListener("click", () => {
     updateBoardByApi("/lifegame/api/random");
+});
+
+// Placeボタンが押されたとき、選択されたパターンをAPIで配置します。
+placePatternButton.addEventListener("click", () => {
+    placePatternByApi();
 });
 
 // 各セルがクリックされたとき、APIを呼び出してセルの生死を切り替えます。
@@ -177,6 +188,18 @@ async function updateBoardByApi(url) {
         stopAutoPlay();
         console.error("Error while updating LifeGame:", error);
     }
+}
+
+/**
+ * 選択されたパターンをAPIで盤面中央に配置します。
+ *
+ * セレクトボックスで選ばれているPatternTypeの値を読み取り、
+ * Spring Boot側のパターン配置APIへ送信します。
+ */
+async function placePatternByApi() {
+    const patternType = patternTypeSelect.value;
+
+    await updateBoardByApi(`/lifegame/api/pattern?patternType=${patternType}`);
 }
 
 /**
