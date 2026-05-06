@@ -133,15 +133,10 @@
                     row の中の1セルずつを cell として取り出します。
                     colStat.index は、現在の列番号を表します。
                 -->
-                <form class="cell-form" th:each="cell, colStat : ${row}" th:action="@{/lifegame/toggle}" method="post">
-
-                    <input type="hidden" name="row" th:value="${rowStat.index}">
-                    <input type="hidden" name="col" th:value="${colStat.index}">
-
-                    <button type="submit" class="cell" th:classappend="${cell} ? ' alive' : ' dead'"
-                        th:attr="data-row=${rowStat.index}, data-col=${colStat.index}" aria-label="Toggle cell">
-                    </button>
-                </form>
+                <button type="button" class="cell" th:each="cell, colStat : ${row}"
+                    th:classappend="${cell} ? ' alive' : ' dead'"
+                    th:attr="data-row=${rowStat.index}, data-col=${colStat.index}" aria-label="Toggle cell">
+                </button>
             </div>
         </div>
     </div>

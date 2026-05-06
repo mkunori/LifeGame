@@ -85,12 +85,6 @@ select {
     display: flex;
 }
 
-/* セルを送信するためのフォームです */
-.cell-form {
-    margin: 0;
-    padding: 0;
-}
-
 /* 盤面の1セル分です */
 .cell {
     display: block;

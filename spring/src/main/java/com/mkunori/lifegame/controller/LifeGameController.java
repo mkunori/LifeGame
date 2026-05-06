@@ -49,22 +49,6 @@ public class LifeGameController {
     }
 
     /**
-     * 指定されたセルの生死を切り替えます。
-     *
-     * セルからPOSTリクエストを受け取り、Serviceにセルの切り替えを依頼します。
-     * 更新後はライフゲーム画面へリダイレクトします。
-     *
-     * @param row 切り替えるセルの行番号
-     * @param col 切り替えるセルの列番号
-     * @return リダイレクト先
-     */
-    @PostMapping("/lifegame/toggle")
-    public String toggle(@RequestParam int row, @RequestParam int col) {
-        lifeGameService.toggleCell(row, col);
-        return "redirect:/lifegame";
-    }
-
-    /**
      * 選択されたパターンを盤面中央に配置します。
      *
      * Pattern選択フォームからPOSTリクエストを受け取り、Serviceにパターン配置を依頼します。
@@ -136,6 +120,23 @@ public class LifeGameController {
     @ResponseBody
     public LifeGameBoard randomizeApi() {
         lifeGameService.randomize();
+        return lifeGameService.getBoard();
+    }
+
+    /**
+     * 指定されたセルの生死を切り替えて、更新後の盤面データを返します。
+     *
+     * JavaScriptから呼び出されます。
+     * rowとcolで指定されたセルを反転し、JSON形式で現在の盤面を返します。
+     *
+     * @param row 切り替えるセルの行番号
+     * @param col 切り替えるセルの列番号
+     * @return 更新後のライフゲーム盤面
+     */
+    @PostMapping("/lifegame/api/toggle")
+    @ResponseBody
+    public LifeGameBoard toggleApi(@RequestParam int row, @RequestParam int col) {
+        lifeGameService.toggleCell(row, col);
         return lifeGameService.getBoard();
     }
 }

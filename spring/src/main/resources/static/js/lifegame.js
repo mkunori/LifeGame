@@ -24,6 +24,9 @@ const resetButton = document.getElementById("resetButton");
 // Randomボタンを取得します。
 const randomButton = document.getElementById("randomButton");
 
+// 盤面上のセルボタンをすべて取得します。
+const cellButtons = document.querySelectorAll(".cell");
+
 // 速度調整スライダーを取得します。
 const speedSlider = document.getElementById("speedSlider");
 
@@ -61,6 +64,13 @@ resetButton.addEventListener("click", () => {
 // Randomボタンが押されたとき、APIを呼び出してランダム配置します。
 randomButton.addEventListener("click", () => {
     updateBoardByApi("/lifegame/api/random");
+});
+
+// 各セルがクリックされたとき、APIを呼び出してセルの生死を切り替えます。
+cellButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+        toggleCellByApi(button);
+    });
 });
 
 // スライダーを動かしたとき、自動再生の速度を変更します。
@@ -127,9 +137,25 @@ async function stepByApi() {
 }
 
 /**
+ * 指定されたセルボタンの行番号・列番号を使って、セルの生死を切り替えます。
+ *
+ * セルボタンに設定されているdata-rowとdata-colを読み取り、
+ * Spring Boot側のtoggle APIへ送信します。
+ *
+ * @param {HTMLButtonElement} button クリックされたセルボタン
+ */
+async function toggleCellByApi(button) {
+    const row = Number(button.dataset.row);
+    const col = Number(button.dataset.col);
+
+    await updateBoardByApi(`/lifegame/api/toggle?row=${row}&col=${col}`);
+}
+
+/**
  * 指定されたAPIを呼び出して、返ってきた盤面データを画面へ反映します。
  *
- * Clear、Reset、Randomなど、盤面を更新してLifeGameBoardを返すAPIで共通利用します。
+ * Step、Clear、Reset、Random、Toggleなど、
+ * 盤面を更新してLifeGameBoardを返すAPIで共通利用します。
  *
  * @param {string} url 呼び出すAPIのURL
  */
@@ -181,8 +207,6 @@ function updateGeneration(generation) {
  * @param {boolean[][]} cells セルの生死状態
  */
 function updateCells(cells) {
-    const cellButtons = document.querySelectorAll(".cell");
-
     cellButtons.forEach((button) => {
         const row = Number(button.dataset.row);
         const col = Number(button.dataset.col);
