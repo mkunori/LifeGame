@@ -49,64 +49,6 @@ public class LifeGameController {
     }
 
     /**
-     * 盤面を1世代進めます。
-     *
-     * フォーム送信用の処理です。
-     * 現在の画面ではJavaScript API版のStep処理を使っていますが、
-     * 通常のPOSTリクエストでも1世代進められるように残しています。
-     * 更新後はライフゲーム画面へリダイレクトします。
-     *
-     * @return リダイレクト先
-     */
-    @PostMapping("/lifegame/step")
-    public String step() {
-        lifeGameService.nextGeneration();
-        return "redirect:/lifegame";
-    }
-
-    /**
-     * 盤面をすべてクリアします。
-     *
-     * ClearボタンからPOSTリクエストを受け取り、Serviceに盤面クリアを依頼します。
-     * 更新後はライフゲーム画面へリダイレクトします。
-     *
-     * @return リダイレクト先
-     */
-    @PostMapping("/lifegame/clear")
-    public String clear() {
-        lifeGameService.clear();
-        return "redirect:/lifegame";
-    }
-
-    /**
-     * 盤面を初期状態に戻します。
-     *
-     * ResetボタンからPOSTリクエストを受け取り、Serviceに盤面の初期化を依頼します。
-     * 更新後はライフゲーム画面へリダイレクトします。
-     *
-     * @return リダイレクト先
-     */
-    @PostMapping("/lifegame/reset")
-    public String reset() {
-        lifeGameService.reset();
-        return "redirect:/lifegame";
-    }
-
-    /**
-     * 盤面をランダムに配置します。
-     *
-     * RandomボタンからPOSTリクエストを受け取り、Serviceにランダム配置を依頼します。
-     * 更新後はライフゲーム画面へリダイレクトします。
-     *
-     * @return リダイレクト先
-     */
-    @PostMapping("/lifegame/random")
-    public String randomize() {
-        lifeGameService.randomize();
-        return "redirect:/lifegame";
-    }
-
-    /**
      * 指定されたセルの生死を切り替えます。
      *
      * セルからPOSTリクエストを受け取り、Serviceにセルの切り替えを依頼します。
@@ -149,6 +91,51 @@ public class LifeGameController {
     @ResponseBody
     public LifeGameBoard stepApi() {
         lifeGameService.nextGeneration();
+        return lifeGameService.getBoard();
+    }
+
+    /**
+     * 盤面をすべてクリアして、更新後の盤面データを返します。
+     *
+     * JavaScriptから呼び出されます。
+     * 通常の画面遷移ではなく、JSON形式のデータとして盤面を返します。
+     *
+     * @return 更新後のライフゲーム盤面
+     */
+    @PostMapping("/lifegame/api/clear")
+    @ResponseBody
+    public LifeGameBoard clearApi() {
+        lifeGameService.clear();
+        return lifeGameService.getBoard();
+    }
+
+    /**
+     * 盤面を初期状態に戻して、更新後の盤面データを返します。
+     *
+     * JavaScriptから呼び出されます。
+     * 通常の画面遷移ではなく、JSON形式のデータとして盤面を返します。
+     *
+     * @return 更新後のライフゲーム盤面
+     */
+    @PostMapping("/lifegame/api/reset")
+    @ResponseBody
+    public LifeGameBoard resetApi() {
+        lifeGameService.reset();
+        return lifeGameService.getBoard();
+    }
+
+    /**
+     * 盤面をランダムに配置して、更新後の盤面データを返します。
+     *
+     * JavaScriptから呼び出されます。
+     * 通常の画面遷移ではなく、JSON形式のデータとして盤面を返します。
+     *
+     * @return 更新後のライフゲーム盤面
+     */
+    @PostMapping("/lifegame/api/random")
+    @ResponseBody
+    public LifeGameBoard randomizeApi() {
+        lifeGameService.randomize();
         return lifeGameService.getBoard();
     }
 }

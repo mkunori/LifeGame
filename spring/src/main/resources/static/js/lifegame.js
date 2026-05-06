@@ -15,6 +15,15 @@ const startButton = document.getElementById("startButton");
 // Stopボタンを取得します。
 const stopButton = document.getElementById("stopButton");
 
+// Clearボタンを取得します。
+const clearButton = document.getElementById("clearButton");
+
+// Resetボタンを取得します。
+const resetButton = document.getElementById("resetButton");
+
+// Randomボタンを取得します。
+const randomButton = document.getElementById("randomButton");
+
 // 速度調整スライダーを取得します。
 const speedSlider = document.getElementById("speedSlider");
 
@@ -37,6 +46,21 @@ startButton.addEventListener("click", () => {
 // Stopボタンが押されたとき、自動再生を停止します。
 stopButton.addEventListener("click", () => {
     stopAutoPlay();
+});
+
+// Clearボタンが押されたとき、APIを呼び出して盤面をクリアします。
+clearButton.addEventListener("click", () => {
+    updateBoardByApi("/lifegame/api/clear");
+});
+
+// Resetボタンが押されたとき、APIを呼び出して初期状態へ戻します。
+resetButton.addEventListener("click", () => {
+    updateBoardByApi("/lifegame/api/reset");
+});
+
+// Randomボタンが押されたとき、APIを呼び出してランダム配置します。
+randomButton.addEventListener("click", () => {
+    updateBoardByApi("/lifegame/api/random");
 });
 
 // スライダーを動かしたとき、自動再生の速度を変更します。
@@ -99,14 +123,25 @@ function changeSpeed(intervalMillis) {
  * HTML上のセル表示と世代数表示を更新します。
  */
 async function stepByApi() {
+    await updateBoardByApi("/lifegame/api/step");
+}
+
+/**
+ * 指定されたAPIを呼び出して、返ってきた盤面データを画面へ反映します。
+ *
+ * Clear、Reset、Randomなど、盤面を更新してLifeGameBoardを返すAPIで共通利用します。
+ *
+ * @param {string} url 呼び出すAPIのURL
+ */
+async function updateBoardByApi(url) {
     try {
-        const response = await fetch("/lifegame/api/step", {
+        const response = await fetch(url, {
             method: "POST"
         });
 
         if (!response.ok) {
             stopAutoPlay();
-            console.error("Failed to step LifeGame:", response.status);
+            console.error("Failed to update LifeGame:", response.status);
             return;
         }
 
@@ -114,7 +149,7 @@ async function stepByApi() {
         updateBoardView(board);
     } catch (error) {
         stopAutoPlay();
-        console.error("Error while stepping LifeGame:", error);
+        console.error("Error while updating LifeGame:", error);
     }
 }
 

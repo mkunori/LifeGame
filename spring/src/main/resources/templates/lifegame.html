@@ -37,27 +37,21 @@
 
         <!--
             Clearボタンです。
-            ボタンを押すと POST /lifegame/clear にリクエストを送ります。
+            JavaScriptでAPIを呼び出し、画面を再読み込みせずに盤面をクリアします。
         -->
-        <form th:action="@{/lifegame/clear}" method="post">
-            <button type="submit" class="control-button">Clear</button>
-        </form>
+        <button type="button" id="clearButton" class="control-button">Clear</button>
 
         <!--
             Resetボタンです。
-            ボタンを押すと POST /lifegame/reset にリクエストを送ります。
+            JavaScriptでAPIを呼び出し、画面を再読み込みせずに初期状態へ戻します。
         -->
-        <form th:action="@{/lifegame/reset}" method="post">
-            <button type="submit" class="control-button">Reset</button>
-        </form>
+        <button type="button" id="resetButton" class="control-button">Reset</button>
 
         <!--
             Randomボタンです。
-            ボタンを押すと POST /lifegame/random にリクエストを送ります。
+            JavaScriptでAPIを呼び出し、画面を再読み込みせずにランダム配置します。
         -->
-        <form th:action="@{/lifegame/random}" method="post">
-            <button type="submit" class="control-button">Random</button>
-        </form>
+        <button type="button" id="randomButton" class="control-button">Random</button>
     </div>
 
     <!-- 自動再生の速度を調整する領域です -->
