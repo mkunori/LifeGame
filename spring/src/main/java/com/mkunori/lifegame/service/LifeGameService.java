@@ -38,6 +38,13 @@ public class LifeGameService {
     }
 
     /**
+     * 盤面を初期状態に戻します。
+     */
+    public void reset() {
+        board.reset();
+    }
+
+    /**
      * 盤面上のセルをランダムに生きた状態または死んだ状態にします。
      */
     public void randomize() {

@@ -34,6 +34,14 @@
         </form>
 
         <!--
+            Resetボタンです。
+            ボタンを押すと POST /lifegame/reset にリクエストを送ります。
+        -->
+        <form th:action="@{/lifegame/reset}" method="post">
+            <button type="submit" class="control-button">Reset</button>
+        </form>
+
+        <!--
             Randomボタンです。
             ボタンを押すと POST /lifegame/random にリクエストを送ります。
         -->

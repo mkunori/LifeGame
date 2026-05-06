@@ -72,6 +72,20 @@ public class LifeGameController {
     }
 
     /**
+     * 盤面を初期状態に戻します。
+     *
+     * ResetボタンからPOSTリクエストを受け取り、Serviceに盤面の初期化を依頼します。
+     * 更新後はライフゲーム画面へリダイレクトします。
+     *
+     * @return リダイレクト先
+     */
+    @PostMapping("/lifegame/reset")
+    public String reset() {
+        lifeGameService.reset();
+        return "redirect:/lifegame";
+    }
+
+    /**
      * 盤面をランダムに配置します。
      *
      * RandomボタンからPOSTリクエストを受け取り、Serviceにランダム配置を依頼します。
