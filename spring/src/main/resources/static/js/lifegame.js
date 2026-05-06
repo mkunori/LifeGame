@@ -3,14 +3,20 @@
 let autoPlayTimerId = null;
 
 // 自動再生の間隔です。
-// 300ミリ秒ごとに1世代進めます。
-const autoPlayIntervalMillis = 300;
+// スライダー操作によって値を変更します。
+let autoPlayIntervalMillis = 300;
 
 // Startボタンを取得します。
 const startButton = document.getElementById("startButton");
 
 // Stopボタンを取得します。
 const stopButton = document.getElementById("stopButton");
+
+// 速度調整スライダーを取得します。
+const speedSlider = document.getElementById("speedSlider");
+
+// 現在の速度を表示する要素を取得します。
+const speedValue = document.getElementById("speedValue");
 
 // 世代数を表示している要素を取得します。
 const generationValue = document.getElementById("generationValue");
@@ -23,6 +29,11 @@ startButton.addEventListener("click", () => {
 // Stopボタンが押されたとき、自動再生を停止します。
 stopButton.addEventListener("click", () => {
     stopAutoPlay();
+});
+
+// スライダーを動かしたとき、自動再生の速度を変更します。
+speedSlider.addEventListener("input", () => {
+    changeSpeed(Number(speedSlider.value));
 });
 
 /**
@@ -53,6 +64,24 @@ function stopAutoPlay() {
 
     clearInterval(autoPlayTimerId);
     autoPlayTimerId = null;
+}
+
+/**
+ * 自動再生の速度を変更します。
+ *
+ * 自動再生中に速度を変更した場合は、
+ * 新しい速度でタイマーを作り直します。
+ *
+ * @param {number} intervalMillis 自動再生の間隔
+ */
+function changeSpeed(intervalMillis) {
+    autoPlayIntervalMillis = intervalMillis;
+    speedValue.textContent = `${intervalMillis} ms`;
+
+    if (autoPlayTimerId !== null) {
+        stopAutoPlay();
+        startAutoPlay();
+    }
 }
 
 /**

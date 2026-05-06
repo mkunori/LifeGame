@@ -25,6 +25,25 @@ h1 {
     cursor: pointer;
 }
 
+/* 自動再生の速度調整を置く領域です */
+.speed-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+/* 速度スライダーの横幅です */
+.speed-controls input[type="range"] {
+    width: 240px;
+}
+
+/* 現在の速度表示です */
+#speedValue {
+    min-width: 70px;
+    font-weight: bold;
+}
+
 /* パターン配置フォームを置く領域です */
 .pattern-controls {
     margin-bottom: 16px;
