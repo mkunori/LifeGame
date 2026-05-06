@@ -1,5 +1,6 @@
 package com.mkunori.lifegame.controller;
 
+import com.mkunori.lifegame.model.LifeGameBoard;
 import com.mkunori.lifegame.model.PatternType;
 import com.mkunori.lifegame.service.LifeGameService;
 import org.springframework.stereotype.Controller;
@@ -7,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * ライフゲーム画面を表示するためのコントローラーです。
@@ -131,5 +133,20 @@ public class LifeGameController {
     public String placePattern(@RequestParam PatternType patternType) {
         lifeGameService.placePattern(patternType);
         return "redirect:/lifegame";
+    }
+
+    /**
+     * 盤面を1世代進めて、更新後の盤面データを返します。
+     *
+     * JavaScriptの自動再生処理から呼び出されます。
+     * 通常の画面遷移ではなく、JSON形式のデータとして盤面を返します。
+     *
+     * @return 更新後のライフゲーム盤面
+     */
+    @PostMapping("/lifegame/api/step")
+    @ResponseBody
+    public LifeGameBoard stepApi() {
+        lifeGameService.nextGeneration();
+        return lifeGameService.getBoard();
     }
 }

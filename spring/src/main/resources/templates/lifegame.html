@@ -26,6 +26,18 @@
         </form>
 
         <!--
+            Startボタンです。
+            JavaScriptで自動再生を開始します。
+        -->
+        <button type="button" id="startButton" class="control-button">Start</button>
+
+        <!--
+            Stopボタンです。
+            JavaScriptで自動再生を停止します。
+        -->
+        <button type="button" id="stopButton" class="control-button">Stop</button>
+
+        <!--
             Clearボタンです。
             ボタンを押すと POST /lifegame/clear にリクエストを送ります。
         -->
@@ -85,7 +97,7 @@
         <!-- 現在の世代数を表示します -->
         <p>
             Generation:
-            <span th:text="${board.generation}">0</span>
+            <span id="generationValue" th:text="${board.generation}">0</span>
         </p>
 
         <!-- 盤面サイズを表示します -->
@@ -120,12 +132,15 @@
                     <input type="hidden" name="col" th:value="${colStat.index}">
 
                     <button type="submit" class="cell" th:classappend="${cell} ? ' alive' : ' dead'"
-                        aria-label="Toggle cell">
+                        th:attr="data-row=${rowStat.index}, data-col=${colStat.index}" aria-label="Toggle cell">
                     </button>
                 </form>
             </div>
         </div>
     </div>
+
+    <!-- 自動再生などの画面操作用JavaScriptを読み込みます -->
+    <script th:src="@{/js/lifegame.js}"></script>
 </body>
 
 </html>
