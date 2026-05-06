@@ -22,7 +22,7 @@
             ボタンを押すと POST /lifegame/step にリクエストを送ります。
         -->
         <form th:action="@{/lifegame/step}" method="post">
-            <button type="submit">Step</button>
+            <button type="submit" class="control-button">Step</button>
         </form>
 
         <!--
@@ -30,7 +30,7 @@
             ボタンを押すと POST /lifegame/clear にリクエストを送ります。
         -->
         <form th:action="@{/lifegame/clear}" method="post">
-            <button type="submit">Clear</button>
+            <button type="submit" class="control-button">Clear</button>
         </form>
 
         <!--
@@ -38,7 +38,7 @@
             ボタンを押すと POST /lifegame/random にリクエストを送ります。
         -->
         <form th:action="@{/lifegame/random}" method="post">
-            <button type="submit">Random</button>
+            <button type="submit" class="control-button">Random</button>
         </form>
     </div>
 
@@ -52,12 +52,38 @@
 
     <!-- ライフゲームの盤面を表示する領域です -->
     <div class="board">
-        <!-- board.cells の1行ずつを row として取り出します -->
-        <div class="board-row" th:each="row : ${board.cells}">
+        <!--
+            board.cells の1行ずつを row として取り出します。
+            rowStat.index は、現在の行番号を表します。
+        -->
+        <div class="board-row" th:each="row, rowStat : ${board.cells}">
 
-            <!-- row の中の1セルずつを cell として取り出します -->
-            <div class="cell" th:each="cell : ${row}" th:classappend="${cell} ? ' alive' : ' dead'">
-            </div>
+            <!--
+                row の中の1セルずつを cell として取り出します。
+                colStat.index は、現在の列番号を表します。
+            -->
+            <form class="cell-form" th:each="cell, colStat : ${row}" th:action="@{/lifegame/toggle}" method="post">
+
+                <!--
+                    クリックされたセルの行番号をControllerへ送ります。
+                    hiddenは画面には表示されない入力項目です。
+                -->
+                <input type="hidden" name="row" th:value="${rowStat.index}">
+
+                <!--
+                    クリックされたセルの列番号をControllerへ送ります。
+                    hiddenは画面には表示されない入力項目です。
+                -->
+                <input type="hidden" name="col" th:value="${colStat.index}">
+
+                <!--
+                    セルそのものをボタンとして表示します。
+                    cellがtrueならalive、falseならdeadのクラスを追加します。
+                -->
+                <button type="submit" class="cell" th:classappend="${cell} ? ' alive' : ' dead'"
+                    aria-label="Toggle cell">
+                </button>
+            </form>
         </div>
     </div>
 </body>

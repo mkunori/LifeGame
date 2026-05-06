@@ -43,4 +43,14 @@ public class LifeGameService {
     public void randomize() {
         board.randomize();
     }
+
+    /**
+     * 指定された位置のセルの生死を切り替えます。
+     *
+     * @param row 行番号
+     * @param col 列番号
+     */
+    public void toggleCell(int row, int col) {
+        board.toggleCell(row, col);
+    }
 }

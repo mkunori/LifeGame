@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * ライフゲーム画面を表示するためのコントローラーです。
@@ -81,6 +82,22 @@ public class LifeGameController {
     @PostMapping("/lifegame/random")
     public String randomize() {
         lifeGameService.randomize();
+        return "redirect:/lifegame";
+    }
+
+    /**
+     * 指定されたセルの生死を切り替えます。
+     *
+     * セルからPOSTリクエストを受け取り、Serviceにセルの切り替えを依頼します。
+     * 更新後はライフゲーム画面へリダイレクトします。
+     *
+     * @param row 切り替えるセルの行番号
+     * @param col 切り替えるセルの列番号
+     * @return リダイレクト先
+     */
+    @PostMapping("/lifegame/toggle")
+    public String toggle(@RequestParam int row, @RequestParam int col) {
+        lifeGameService.toggleCell(row, col);
         return "redirect:/lifegame";
     }
 }

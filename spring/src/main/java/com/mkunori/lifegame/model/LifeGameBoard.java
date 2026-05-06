@@ -67,6 +67,23 @@ public class LifeGameBoard {
     }
 
     /**
+     * 指定された位置のセルの生死を切り替えます。
+     *
+     * 生きているセルなら死んだ状態にし、死んでいるセルなら生きた状態にします。
+     * 盤面の外側が指定された場合は、何もせずに処理を終えます。
+     *
+     * @param row 行番号
+     * @param col 列番号
+     */
+    public void toggleCell(int row, int col) {
+        if (!isInside(row, col)) {
+            return;
+        }
+
+        cells[row][col] = !cells[row][col];
+    }
+
+    /**
      * 盤面を1世代進めます。
      *
      * 現在の盤面をもとに次の世代の盤面を作成し、

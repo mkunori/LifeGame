@@ -17,8 +17,8 @@ h1 {
     margin-bottom: 16px;
 }
 
-/* ボタンの基本的な見た目を設定します */
-button {
+/* Step、Clear、Randomなどの操作ボタンの見た目です */
+.control-button {
     padding: 8px 16px;
     font-size: 16px;
     cursor: pointer;
@@ -37,12 +37,22 @@ button {
     display: flex;
 }
 
+/* セルを送信するためのフォームです */
+.cell-form {
+    margin: 0;
+    padding: 0;
+}
+
 /* 盤面の1セル分です */
 .cell {
+    display: block;
     width: 14px;
     height: 14px;
+    padding: 0;
+    margin: 0;
     border: 1px solid #dddddd;
     box-sizing: border-box;
+    cursor: pointer;
 }
 
 /* 生きているセルの見た目です */
@@ -53,4 +63,10 @@ button {
 /* 死んでいるセルの見た目です */
 .cell.dead {
     background-color: #ffffff;
+}
+
+/* セルにフォーカスが当たったときの見た目です */
+.cell:focus {
+    outline: 1px solid #666666;
+    outline-offset: -1px;
 }
