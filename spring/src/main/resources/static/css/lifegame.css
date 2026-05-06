@@ -24,6 +24,16 @@ h1 {
     cursor: pointer;
 }
 
+/* 盤面の状態表示をまとめる領域です */
+.status {
+    margin-bottom: 16px;
+}
+
+/* 状態表示の文章です */
+.status p {
+    margin: 4px 0;
+}
+
 /* 盤面全体を囲む領域です */
 .board {
     display: inline-block;

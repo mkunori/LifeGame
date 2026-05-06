@@ -42,13 +42,22 @@
         </form>
     </div>
 
-    <!-- 盤面サイズの確認表示です -->
-    <p>
-        Board size:
-        <span th:text="${board.rows}">0</span>
-        x
-        <span th:text="${board.cols}">0</span>
-    </p>
+    <!-- 盤面の状態を表示する領域です -->
+    <div class="status">
+        <!-- 現在の世代数を表示します -->
+        <p>
+            Generation:
+            <span th:text="${board.generation}">0</span>
+        </p>
+
+        <!-- 盤面サイズを表示します -->
+        <p>
+            Board size:
+            <span th:text="${board.rows}">0</span>
+            x
+            <span th:text="${board.cols}">0</span>
+        </p>
+    </div>
 
     <!-- ライフゲームの盤面を表示する領域です -->
     <div class="board">

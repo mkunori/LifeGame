@@ -13,6 +13,7 @@ public class LifeGameBoard {
     private final int rows;
     private final int cols;
     private boolean[][] cells;
+    private int generation;
     private final Random random = new Random();
 
     /**
@@ -25,6 +26,7 @@ public class LifeGameBoard {
         this.rows = rows;
         this.cols = cols;
         this.cells = new boolean[rows][cols];
+        this.generation = 0;
         initializeSamplePattern();
     }
 
@@ -44,6 +46,15 @@ public class LifeGameBoard {
      */
     public int getCols() {
         return cols;
+    }
+
+    /**
+     * 現在の世代数を返します。
+     *
+     * @return 現在の世代数
+     */
+    public int getGeneration() {
+        return generation;
     }
 
     /**
@@ -105,6 +116,7 @@ public class LifeGameBoard {
         }
 
         cells = nextCells;
+        generation++;
     }
 
     /**
@@ -112,6 +124,7 @@ public class LifeGameBoard {
      */
     public void clear() {
         cells = new boolean[rows][cols];
+        generation = 0;
     }
 
     /**
@@ -125,6 +138,8 @@ public class LifeGameBoard {
                 cells[row][col] = random.nextInt(4) == 0;
             }
         }
+
+        generation = 0;
     }
 
     /**
