@@ -97,40 +97,33 @@
         </p>
     </div>
 
-    <!-- ライフゲームの盤面を表示する領域です -->
-    <div class="board">
-        <!--
-            board.cells の1行ずつを row として取り出します。
-            rowStat.index は、現在の行番号を表します。
-        -->
-        <div class="board-row" th:each="row, rowStat : ${board.cells}">
-
+    <!--
+        盤面が画面幅より大きくなったときに、
+        横スクロールできるようにするための外側の領域です。
+    -->
+    <div class="board-wrapper">
+        <!-- ライフゲームの盤面を表示する領域です -->
+        <div class="board">
             <!--
-                row の中の1セルずつを cell として取り出します。
-                colStat.index は、現在の列番号を表します。
+                board.cells の1行ずつを row として取り出します。
+                rowStat.index は、現在の行番号を表します。
             -->
-            <form class="cell-form" th:each="cell, colStat : ${row}" th:action="@{/lifegame/toggle}" method="post">
+            <div class="board-row" th:each="row, rowStat : ${board.cells}">
 
                 <!--
-                    クリックされたセルの行番号をControllerへ送ります。
-                    hiddenは画面には表示されない入力項目です。
+                    row の中の1セルずつを cell として取り出します。
+                    colStat.index は、現在の列番号を表します。
                 -->
-                <input type="hidden" name="row" th:value="${rowStat.index}">
+                <form class="cell-form" th:each="cell, colStat : ${row}" th:action="@{/lifegame/toggle}" method="post">
 
-                <!--
-                    クリックされたセルの列番号をControllerへ送ります。
-                    hiddenは画面には表示されない入力項目です。
-                -->
-                <input type="hidden" name="col" th:value="${colStat.index}">
+                    <input type="hidden" name="row" th:value="${rowStat.index}">
+                    <input type="hidden" name="col" th:value="${colStat.index}">
 
-                <!--
-                    セルそのものをボタンとして表示します。
-                    cellがtrueならalive、falseならdeadのクラスを追加します。
-                -->
-                <button type="submit" class="cell" th:classappend="${cell} ? ' alive' : ' dead'"
-                    aria-label="Toggle cell">
-                </button>
-            </form>
+                    <button type="submit" class="cell" th:classappend="${cell} ? ' alive' : ' dead'"
+                        aria-label="Toggle cell">
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </body>

@@ -74,8 +74,8 @@ select {
 /* 盤面の1セル分です */
 .cell {
     display: block;
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     padding: 0;
     margin: 0;
     border: 1px solid #dddddd;
@@ -97,4 +97,10 @@ select {
 .cell:focus {
     outline: 1px solid #666666;
     outline-offset: -1px;
+}
+
+/* 盤面が横に大きい場合にスクロールできる外側の領域です */
+.board-wrapper {
+    max-width: 100%;
+    overflow-x: auto;
 }
