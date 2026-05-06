@@ -19,11 +19,9 @@
     <div class="controls">
         <!--
             Stepボタンです。
-            ボタンを押すと POST /lifegame/step にリクエストを送ります。
+            JavaScriptでAPIを呼び出し、画面を再読み込みせずに1世代進めます。
         -->
-        <form th:action="@{/lifegame/step}" method="post">
-            <button type="submit" class="control-button">Step</button>
-        </form>
+        <button type="button" id="stepButton" class="control-button">Step</button>
 
         <!--
             Startボタンです。

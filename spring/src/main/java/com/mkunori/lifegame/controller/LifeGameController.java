@@ -51,7 +51,9 @@ public class LifeGameController {
     /**
      * 盤面を1世代進めます。
      *
-     * StepボタンからPOSTリクエストを受け取り、Serviceに盤面更新を依頼します。
+     * フォーム送信用の処理です。
+     * 現在の画面ではJavaScript API版のStep処理を使っていますが、
+     * 通常のPOSTリクエストでも1世代進められるように残しています。
      * 更新後はライフゲーム画面へリダイレクトします。
      *
      * @return リダイレクト先

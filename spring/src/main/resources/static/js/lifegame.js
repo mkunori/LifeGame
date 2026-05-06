@@ -6,6 +6,9 @@ let autoPlayTimerId = null;
 // スライダー操作によって値を変更します。
 let autoPlayIntervalMillis = 300;
 
+// Stepボタンを取得します。
+const stepButton = document.getElementById("stepButton");
+
 // Startボタンを取得します。
 const startButton = document.getElementById("startButton");
 
@@ -20,6 +23,11 @@ const speedValue = document.getElementById("speedValue");
 
 // 世代数を表示している要素を取得します。
 const generationValue = document.getElementById("generationValue");
+
+// Stepボタンが押されたとき、APIを呼び出して1世代進めます。
+stepButton.addEventListener("click", () => {
+    stepByApi();
+});
 
 // Startボタンが押されたとき、自動再生を開始します。
 startButton.addEventListener("click", () => {
