@@ -171,7 +171,13 @@
         </div>
     </div>
 
-    <!-- 自動再生などの画面操作用JavaScriptを読み込みます -->
+    <!-- API呼び出し用JavaScriptを読み込みます -->
+    <script th:src="@{/js/lifegameApi.js}"></script>
+
+    <!-- 画面更新用JavaScriptを読み込みます -->
+    <script th:src="@{/js/lifegameView.js}"></script>
+
+    <!-- ライフゲーム画面全体の制御用JavaScriptを読み込みます -->
     <script th:src="@{/js/lifegame.js}"></script>
 </body>
 

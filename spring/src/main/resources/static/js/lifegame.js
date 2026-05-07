@@ -14,7 +14,7 @@ let autoPlayIntervalMillis = 300;
 let isDragging = false;
 
 // 1回のドラッグ操作中に、すでに処理したセルを記録します。
-// 同じセルを何度も反転しないために使います。
+// 同じセルを何度も編集しないために使います。
 let draggedCellKeys = new Set();
 
 // 1回のドラッグ操作中に通過したセル位置を記録します。
@@ -53,6 +53,12 @@ const placePatternButton = document.getElementById("placePatternButton");
 // セル編集モード選択用のセレクトボックスを取得します。
 const cellEditModeSelect = document.getElementById("cellEditMode");
 
+// 盤面操作モード選択用のセレクトボックスを取得します。
+const actionModeSelect = document.getElementById("actionMode");
+
+// Edit Modeの補足説明を表示する要素を取得します。
+const editModeHelp = document.getElementById("editModeHelp");
+
 // 盤面上のセルボタンをすべて取得します。
 const cellButtons = document.querySelectorAll(".cell");
 
@@ -65,11 +71,6 @@ const speedValue = document.getElementById("speedValue");
 // 世代数を表示している要素を取得します。
 const generationValue = document.getElementById("generationValue");
 
-// 盤面操作モード選択用のセレクトボックスを取得します。
-const actionModeSelect = document.getElementById("actionMode");
-
-// Edit Modeの補足説明を表示する要素を取得します。
-const editModeHelp = document.getElementById("editModeHelp");
 
 // ==================================================
 // イベント登録
@@ -91,21 +92,24 @@ stopButton.addEventListener("click", () => {
 });
 
 // Clearボタンが押されたとき、APIを呼び出して盤面をクリアします。
-clearButton.addEventListener("click", () => {
-    updateBoardByApi("/lifegame/api/clear");
+clearButton.addEventListener("click", async () => {
+    const board = await clearBoardApi();
+    applyBoardIfAvailable(board);
 });
 
 // Resetボタンが押されたとき、APIを呼び出して初期状態へ戻します。
-resetButton.addEventListener("click", () => {
-    updateBoardByApi("/lifegame/api/reset");
+resetButton.addEventListener("click", async () => {
+    const board = await resetBoardApi();
+    applyBoardIfAvailable(board);
 });
 
 // Randomボタンが押されたとき、APIを呼び出してランダム配置します。
-randomButton.addEventListener("click", () => {
-    updateBoardByApi("/lifegame/api/random");
+randomButton.addEventListener("click", async () => {
+    const board = await randomizeBoardApi();
+    applyBoardIfAvailable(board);
 });
 
-// Placeボタンが押されたとき、選択されたパターンをAPIで配置します。
+// Placeボタンが押されたとき、選択されたパターンを盤面中央に配置します。
 placePatternButton.addEventListener("click", () => {
     placePatternByApi();
 });
@@ -137,6 +141,14 @@ speedSlider.addEventListener("input", () => {
 actionModeSelect.addEventListener("change", () => {
     updateControlsForActionMode();
 });
+
+
+// ==================================================
+// 初期化
+// ==================================================
+
+// 初期表示時にも、Action Modeに合わせてUI状態を整えます。
+updateControlsForActionMode();
 
 
 // ==================================================
@@ -190,6 +202,7 @@ function changeSpeed(intervalMillis) {
         startAutoPlay();
     }
 }
+
 
 // ==================================================
 // セルドラッグ操作関連
@@ -311,27 +324,6 @@ function applyCellEditViewOnly(button) {
 }
 
 /**
- * セルの見た目だけを反転します。
- *
- * @param {HTMLButtonElement} button 見た目を反転したいセルボタン
- */
-function toggleCellViewOnly(button) {
-    const isAlive = button.classList.contains("alive");
-    setCellViewOnly(button, !isAlive);
-}
-
-/**
- * セルの見た目だけを指定された状態にします。
- *
- * @param {HTMLButtonElement} button 見た目を変更したいセルボタン
- * @param {boolean} alive 生きた状態として表示する場合はtrue
- */
-function setCellViewOnly(button, alive) {
-    button.classList.toggle("alive", alive);
-    button.classList.toggle("dead", !alive);
-}
-
-/**
  * セルを一意に識別するためのキーを作成します。
  *
  * 行番号と列番号を組み合わせて、"10,20" のような文字列を作ります。
@@ -342,6 +334,11 @@ function setCellViewOnly(button, alive) {
 function createCellKey(button) {
     return `${button.dataset.row},${button.dataset.col}`;
 }
+
+
+// ==================================================
+// モード制御関連
+// ==================================================
 
 /**
  * 現在のAction ModeがPlace Patternかどうかを判定します。
@@ -370,15 +367,17 @@ function updateControlsForActionMode() {
     }
 }
 
+
 // ==================================================
-// API呼び出し関連
+// API呼び出しの利用処理
 // ==================================================
 
 /**
  * Spring Boot側のAPIを呼び出して、盤面を1世代進めます。
  */
 async function stepByApi() {
-    await updateBoardByApi("/lifegame/api/step");
+    const board = await stepBoardApi();
+    applyBoardIfAvailable(board);
 }
 
 /**
@@ -388,11 +387,9 @@ async function stepByApi() {
  */
 async function editCellsByApi(cells) {
     const mode = cellEditModeSelect.value;
+    const board = await editCellsApi(mode, cells);
 
-    await updateBoardByApi("/lifegame/api/edit-cells", {
-        mode: mode,
-        cells: cells
-    });
+    applyBoardIfAvailable(board);
 }
 
 /**
@@ -404,50 +401,9 @@ async function placePatternAtCellByApi(button) {
     const patternType = patternTypeSelect.value;
     const row = Number(button.dataset.row);
     const col = Number(button.dataset.col);
+    const board = await placePatternApi(patternType, row, col);
 
-    await updateBoardByApi("/lifegame/api/pattern", {
-        patternType: patternType,
-        row: row,
-        col: col
-    });
-}
-
-/**
- * 指定されたAPIを呼び出して、返ってきた盤面データを画面へ反映します。
- *
- * requestBodyを渡した場合は、JSONとしてSpring Boot側へ送信します。
- * requestBodyを省略した場合は、POSTだけを送信します。
- *
- * @param {string} url 呼び出すAPIのURL
- * @param {object|null} requestBody APIへ送るJSONデータ
- */
-async function updateBoardByApi(url, requestBody = null) {
-    try {
-        const options = {
-            method: "POST"
-        };
-
-        if (requestBody !== null) {
-            options.headers = {
-                "Content-Type": "application/json"
-            };
-            options.body = JSON.stringify(requestBody);
-        }
-
-        const response = await fetch(url, options);
-
-        if (!response.ok) {
-            stopAutoPlay();
-            console.error("Failed to update LifeGame:", response.status);
-            return;
-        }
-
-        const board = await response.json();
-        updateBoardView(board);
-    } catch (error) {
-        stopAutoPlay();
-        console.error("Error while updating LifeGame:", error);
-    }
+    applyBoardIfAvailable(board);
 }
 
 /**
@@ -458,12 +414,26 @@ async function updateBoardByApi(url, requestBody = null) {
 async function placePatternByApi() {
     const patternType = patternTypeSelect.value;
     const center = calculateBoardCenter();
+    const board = await placePatternApi(patternType, center.row, center.col);
 
-    await updateBoardByApi("/lifegame/api/pattern", {
-        patternType: patternType,
-        row: center.row,
-        col: center.col
-    });
+    applyBoardIfAvailable(board);
+}
+
+/**
+ * APIから受け取った盤面データがあれば画面に反映します。
+ *
+ * API呼び出しに失敗してnullが返ってきた場合は、
+ * 自動再生を停止します。
+ *
+ * @param {object|null} board 更新後の盤面データ
+ */
+function applyBoardIfAvailable(board) {
+    if (board === null) {
+        stopAutoPlay();
+        return;
+    }
+
+    updateBoardView(board, generationValue, cellButtons);
 }
 
 /**
@@ -490,46 +460,4 @@ function calculateBoardCenter() {
         row: Math.floor(maxRow / 2),
         col: Math.floor(maxCol / 2)
     };
-}
-
-// ==================================================
-// 画面更新関連
-// ==================================================
-
-/**
- * APIから受け取った盤面データを画面に反映します。
- *
- * @param {object} board Spring Boot側から返された盤面データ
- */
-function updateBoardView(board) {
-    updateGeneration(board.generation);
-    updateCells(board.cells);
-}
-
-/**
- * 世代数の表示を更新します。
- *
- * @param {number} generation 現在の世代数
- */
-function updateGeneration(generation) {
-    generationValue.textContent = generation;
-}
-
-/**
- * セルの表示を更新します。
- *
- * cellsはbooleanの二次元配列です。
- * trueならalive、falseならdeadとして表示を切り替えます。
- *
- * @param {boolean[][]} cells セルの生死状態
- */
-function updateCells(cells) {
-    cellButtons.forEach((button) => {
-        const row = Number(button.dataset.row);
-        const col = Number(button.dataset.col);
-        const alive = cells[row][col];
-
-        button.classList.toggle("alive", alive);
-        button.classList.toggle("dead", !alive);
-    });
 }
