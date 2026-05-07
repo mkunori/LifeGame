@@ -1,7 +1,6 @@
 package com.mkunori.lifegame.controller;
 
 import com.mkunori.lifegame.controller.request.PlacePatternRequest;
-import com.mkunori.lifegame.controller.request.ToggleCellRequest;
 import com.mkunori.lifegame.controller.request.ToggleCellsRequest;
 import com.mkunori.lifegame.model.LifeGameBoard;
 import com.mkunori.lifegame.service.LifeGameService;
