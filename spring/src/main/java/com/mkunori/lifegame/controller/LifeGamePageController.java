@@ -1,5 +1,6 @@
 package com.mkunori.lifegame.controller;
 
+import com.mkunori.lifegame.model.CellEditMode;
 import com.mkunori.lifegame.model.PatternType;
 import com.mkunori.lifegame.service.LifeGameService;
 import org.springframework.stereotype.Controller;
@@ -41,6 +42,7 @@ public class LifeGamePageController {
     public String showLifeGame(Model model) {
         model.addAttribute("board", lifeGameService.getBoard());
         model.addAttribute("patternTypes", PatternType.values());
+        model.addAttribute("cellEditModes", CellEditMode.values());
         return "lifegame";
     }
 }

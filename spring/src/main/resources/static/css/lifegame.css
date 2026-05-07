@@ -44,8 +44,11 @@ h1 {
     font-weight: bold;
 }
 
-/* パターン配置フォームを置く領域です */
-.pattern-controls {
+/* セル編集モード選択を置く領域です */
+.edit-mode-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     margin-bottom: 16px;
 }
 
@@ -57,7 +60,7 @@ h1 {
     margin-bottom: 16px;
 }
 
-/* パターン選択用のセレクトボックスです */
+/* パターン選択や編集モード選択用のセレクトボックスです */
 select {
     padding: 8px;
     font-size: 16px;

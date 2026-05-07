@@ -1,6 +1,8 @@
 package com.mkunori.lifegame.service;
 
 import com.mkunori.lifegame.controller.request.CellPositionRequest;
+import com.mkunori.lifegame.model.CellEditMode;
+import com.mkunori.lifegame.model.CellPosition;
 import com.mkunori.lifegame.model.LifeGameBoard;
 import com.mkunori.lifegame.model.PatternType;
 
@@ -57,23 +59,29 @@ public class LifeGameService {
     }
 
     /**
-     * 指定された位置のセルの生死を切り替えます。
+     * 指定された複数セルを、編集モードに応じてまとめて編集します。
      *
-     * @param row 行番号
-     * @param col 列番号
+     * @param mode  セル編集モード
+     * @param cells 編集するセル位置の一覧
      */
-    public void toggleCell(int row, int col) {
-        board.toggleCell(row, col);
+    public void editCells(CellEditMode mode, List<CellPosition> cells) {
+        for (CellPosition cell : cells) {
+            editCell(mode, cell.row(), cell.col());
+        }
     }
 
     /**
-     * 指定された複数セルの生死をまとめて切り替えます。
+     * 指定された1つのセルを、編集モードに応じて編集します。
      *
-     * @param cells 切り替えるセル位置の一覧
+     * @param mode セル編集モード
+     * @param row  行番号
+     * @param col  列番号
      */
-    public void toggleCells(List<CellPositionRequest> cells) {
-        for (CellPositionRequest cell : cells) {
-            board.toggleCell(cell.row(), cell.col());
+    private void editCell(CellEditMode mode, int row, int col) {
+        switch (mode) {
+            case TOGGLE -> board.toggleCell(row, col);
+            case DRAW -> board.setCellAlive(row, col);
+            case ERASE -> board.setCellDead(row, col);
         }
     }
 

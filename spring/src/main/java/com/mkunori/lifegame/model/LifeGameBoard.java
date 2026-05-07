@@ -95,6 +95,38 @@ public class LifeGameBoard {
     }
 
     /**
+     * 指定された位置のセルを生きた状態にします。
+     *
+     * 盤面の外側が指定された場合は、何もせずに処理を終えます。
+     *
+     * @param row 行番号
+     * @param col 列番号
+     */
+    public void setCellAlive(int row, int col) {
+        if (!isInside(row, col)) {
+            return;
+        }
+
+        cells[row][col] = true;
+    }
+
+    /**
+     * 指定された位置のセルを死んだ状態にします。
+     *
+     * 盤面の外側が指定された場合は、何もせずに処理を終えます。
+     *
+     * @param row 行番号
+     * @param col 列番号
+     */
+    public void setCellDead(int row, int col) {
+        if (!isInside(row, col)) {
+            return;
+        }
+
+        cells[row][col] = false;
+    }
+
+    /**
      * 盤面を1世代進めます。
      *
      * 現在の盤面をもとに次の世代の盤面を作成し、

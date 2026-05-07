@@ -23,18 +23,17 @@ Swing版で作成したライフゲームの考え方をもとに、Web画面、
 
 ## ■ 主な機能
 
-### Swing版
+### 共通
 
-- セルのクリックによる ON / OFF 切り替え
+- セルクリックによる ON / OFF 切り替え
 - ドラッグによるセル描画（Toggleモード）
+- 1世代だけ進める Step 操作
 - 世代の自動更新（Start / Stop）
 - ランダム配置（Random）
 - 全消去（Clear）
-- 更新速度の変更（JSlider）
+- 初期状態へのリセット（Reset）
+- 更新速度の変更（Speed スライダー）
 - 世代数表示（Generation）
-- 状態表示（Running / Stopped）
-- Start / Stop ボタンの有効・無効制御
-- モード選択用プルダウン
 - パターン配置
   - Glider
   - Block
@@ -42,51 +41,20 @@ Swing版で作成したライフゲームの考え方をもとに、Web画面、
   - Toad
   - Beacon
   - Gosper Glider Gun
+
+### Swing版
+
+- 状態表示（Running / Stopped）
 - プレビュー機能
 
 ### Spring Boot版
 
 - ブラウザ上でのライフゲーム盤面表示
-- セルクリックによる ON / OFF 切り替え
-- 1世代だけ進める Step 操作
-- 自動更新（Start / Stop）
-- 更新速度の変更（Speed スライダー）
-- ランダム配置（Random）
-- 初期状態へのリセット（Reset）
-- 全消去（Clear）
-- 世代数表示（Generation）
-- パターン配置
-  - Glider
-  - Block
-  - Blinker
-  - Toad
-  - Beacon
-  - Gosper Glider Gun
-- JavaScript + fetch API による画面の部分更新
-- PageController と ApiController の分離
+- 描画モード選択（Toggle / Draw / Erase）
 
 ## ■ 操作方法
 
-### Swing版
-
-- 盤面クリック  
-  現在のモードに応じてセルの反転またはパターン配置を行います
-- ドラッグ（Toggleモード）  
-  通過したセルを1回ずつ反転します
-- Start  
-  シミュレーションを開始します
-- Stop  
-  シミュレーションを停止します
-- Random  
-  盤面をランダムな状態で初期化します
-- Clear  
-  盤面をすべてクリアします
-- Speed スライダー  
-  世代更新の間隔を変更します
-- Mode プルダウン  
-  クリック時の動作モードを切り替えます
-
-### Spring Boot版
+### 共通
 
 - セルクリック  
   クリックしたセルの生死を切り替えます
@@ -106,6 +74,15 @@ Swing版で作成したライフゲームの考え方をもとに、Web画面、
   盤面をランダムな状態にします
 - Pattern プルダウン  
   配置するパターンを選択します
+
+### Swing版
+
+- ドラッグ（Toggleモード）  
+  通過したセルを1回ずつ反転します
+
+### Spring Boot版
+
+- ドラッグ（Toggle / Draw / Eraseモード）
 - Place  
   選択したパターンを盤面中央に配置します
 
@@ -379,10 +356,7 @@ sequenceDiagram
 
 ### Spring Boot版
 
-- ドラッグによるセル描画
 - クリック位置へのパターン配置
-- APIリクエストをURLパラメータ方式からJSON方式へ変更
-- リクエスト用recordクラスの導入
 - JavaScriptファイルの責務分離
 - 盤面サイズ変更機能
 - セッションごとの盤面管理
@@ -409,3 +383,5 @@ sequenceDiagram
 - `@Controller` と `@RestController` の使い分け
 - `@RequestParam` によるリクエストパラメータの受け取り
 - enumを使ったパターン選択
+- JSONリクエストを `@RequestBody` と record で受け取る実装
+- ドラッグ描画時に複数セルをまとめて送信するAPI設計

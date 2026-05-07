@@ -69,6 +69,26 @@
         <span id="speedValue">300 ms</span>
     </div>
 
+    <!-- セル編集モードを選択する領域です -->
+    <div class="edit-mode-controls">
+        <!-- セル編集モード選択用のラベルです -->
+        <label for="cellEditMode">Edit Mode:</label>
+
+        <!--
+            セル編集モードを選ぶセレクトボックスです。
+            cellEditModesはControllerから渡されたCellEditMode.values()です。
+        -->
+        <select id="cellEditMode" name="cellEditMode">
+            <!--
+                cellEditModesから1つずつmodeを取り出します。
+                valueにはenum名、表示にはdisplayNameを使います。
+            -->
+            <option th:each="mode : ${cellEditModes}" th:value="${mode.name()}" th:text="${mode.displayName}">
+                Edit Mode
+            </option>
+        </select>
+    </div>
+
     <!-- パターン配置用の操作領域です -->
     <div class="pattern-controls">
         <!-- パターン選択用のラベルです -->
@@ -131,7 +151,7 @@
                 -->
                 <button type="button" class="cell" th:each="cell, colStat : ${row}"
                     th:classappend="${cell} ? ' alive' : ' dead'"
-                    th:attr="data-row=${rowStat.index}, data-col=${colStat.index}" aria-label="Toggle cell">
+                    th:attr="data-row=${rowStat.index}, data-col=${colStat.index}" aria-label="Edit cell">
                 </button>
             </div>
         </div>

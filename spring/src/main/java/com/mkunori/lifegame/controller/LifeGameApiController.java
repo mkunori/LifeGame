@@ -1,7 +1,7 @@
 package com.mkunori.lifegame.controller;
 
+import com.mkunori.lifegame.controller.request.EditCellsRequest;
 import com.mkunori.lifegame.controller.request.PlacePatternRequest;
-import com.mkunori.lifegame.controller.request.ToggleCellsRequest;
 import com.mkunori.lifegame.model.LifeGameBoard;
 import com.mkunori.lifegame.service.LifeGameService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -77,16 +77,17 @@ public class LifeGameApiController {
     }
 
     /**
-     * 複数セルの生死をまとめて切り替えて、更新後の盤面データを返します。
+     * 複数セルを編集して、更新後の盤面データを返します。
      *
-     * ドラッグ描画で通過したセルを、JavaScriptからまとめて受け取ります。
+     * ドラッグ描画で通過したセルをJavaScriptからまとめて受け取り、
+     * 指定された編集モードに応じて、反転、描画、消去を行います。
      *
-     * @param request 切り替えるセル位置の一覧を含むリクエスト
+     * @param request 編集モードとセル位置の一覧を含むリクエスト
      * @return 更新後のライフゲーム盤面
      */
-    @PostMapping("/lifegame/api/toggle-cells")
-    public LifeGameBoard toggleCells(@RequestBody ToggleCellsRequest request) {
-        lifeGameService.toggleCells(request.cells());
+    @PostMapping("/lifegame/api/edit-cells")
+    public LifeGameBoard editCells(@RequestBody EditCellsRequest request) {
+        lifeGameService.editCells(request.mode(), request.cells());
         return lifeGameService.getBoard();
     }
 

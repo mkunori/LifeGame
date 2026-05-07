@@ -50,6 +50,9 @@ const patternTypeSelect = document.getElementById("patternType");
 // パターン配置ボタンを取得します。
 const placePatternButton = document.getElementById("placePatternButton");
 
+// セル編集モード選択用のセレクトボックスを取得します。
+const cellEditModeSelect = document.getElementById("cellEditMode");
+
 // 盤面上のセルボタンをすべて取得します。
 const cellButtons = document.querySelectorAll(".cell");
 
@@ -104,12 +107,12 @@ placePatternButton.addEventListener("click", () => {
 
 // 各セルに、クリックとドラッグ描画用のイベントを登録します。
 cellButtons.forEach((button) => {
-    // マウスボタンを押したセルを反転し、ドラッグ開始状態にします。
+    // マウスボタンを押したセルを編集し、ドラッグ開始状態にします。
     button.addEventListener("mousedown", (event) => {
         startCellDrag(event, button);
     });
 
-    // ドラッグ中に別のセルへ入ったら、そのセルを反転します。
+    // ドラッグ中に別のセルへ入ったら、そのセルを編集します。
     button.addEventListener("mouseenter", () => {
         dragOverCell(button);
     });
@@ -234,7 +237,7 @@ function endCellDrag() {
     isDragging = false;
 
     if (draggedCells.length > 0) {
-        toggleCellsByApi(draggedCells);
+        editCellsByApi(draggedCells);
     }
 
     draggedCellKeys.clear();
@@ -263,22 +266,55 @@ function addCellOnceDuringDrag(button) {
         col: Number(button.dataset.col)
     });
 
-    toggleCellViewOnly(button);
+    applyCellEditViewOnly(button);
+}
+
+/**
+ * セルの見た目だけを、選択中の編集モードに応じて変更します。
+ *
+ * APIの結果を待たずに、ドラッグ中の操作感を軽くするために使います。
+ * 最終的にはAPIから返ってきた盤面データで画面全体を正しい状態に更新します。
+ *
+ * @param {HTMLButtonElement} button 見た目を変更したいセルボタン
+ */
+function applyCellEditViewOnly(button) {
+    const mode = cellEditModeSelect.value;
+
+    switch (mode) {
+        case "TOGGLE":
+            toggleCellViewOnly(button);
+            break;
+        case "DRAW":
+            setCellViewOnly(button, true);
+            break;
+        case "ERASE":
+            setCellViewOnly(button, false);
+            break;
+        default:
+            console.warn("Unknown cell edit mode:", mode);
+            break;
+    }
 }
 
 /**
  * セルの見た目だけを反転します。
  *
- * APIの結果を待たずに、ドラッグ中の操作感を軽くするために使います。
- * 最終的にはAPIから返ってきた盤面データで画面全体を正しい状態に更新します。
- *
  * @param {HTMLButtonElement} button 見た目を反転したいセルボタン
  */
 function toggleCellViewOnly(button) {
     const isAlive = button.classList.contains("alive");
+    setCellViewOnly(button, !isAlive);
+}
 
-    button.classList.toggle("alive", !isAlive);
-    button.classList.toggle("dead", isAlive);
+/**
+ * セルの見た目だけを指定された状態にします。
+ *
+ * @param {HTMLButtonElement} button 見た目を変更したいセルボタン
+ * @param {boolean} alive 生きた状態として表示する場合はtrue
+ */
+function setCellViewOnly(button, alive) {
+    button.classList.toggle("alive", alive);
+    button.classList.toggle("dead", !alive);
 }
 
 /**
@@ -305,12 +341,15 @@ async function stepByApi() {
 }
 
 /**
- * 指定された複数セルの生死を、APIでまとめて切り替えます。
+ * 指定された複数セルを、選択中の編集モードでまとめて編集します。
  *
- * @param {{row: number, col: number}[]} cells 切り替えるセル位置の一覧
+ * @param {{row: number, col: number}[]} cells 編集するセル位置の一覧
  */
-async function toggleCellsByApi(cells) {
-    await updateBoardByApi("/lifegame/api/toggle-cells", {
+async function editCellsByApi(cells) {
+    const mode = cellEditModeSelect.value;
+
+    await updateBoardByApi("/lifegame/api/edit-cells", {
+        mode: mode,
         cells: cells
     });
 }
