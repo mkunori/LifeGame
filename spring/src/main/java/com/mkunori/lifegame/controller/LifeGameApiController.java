@@ -92,17 +92,17 @@ public class LifeGameApiController {
     }
 
     /**
-     * 選択されたパターンを盤面中央に配置して、更新後の盤面データを返します。
+     * 選択されたパターンを指定位置に配置して、更新後の盤面データを返します。
      *
      * JavaScriptから送られてきたJSONリクエストを受け取り、
-     * requestに含まれるパターン種別を盤面中央へ配置します。
+     * requestに含まれるパターン種別と位置を使ってパターンを配置します。
      *
-     * @param request 配置するパターンの種類を含むリクエスト
+     * @param request 配置するパターンの種類と位置を含むリクエスト
      * @return 更新後のライフゲーム盤面
      */
     @PostMapping("/lifegame/api/pattern")
     public LifeGameBoard placePattern(@RequestBody PlacePatternRequest request) {
-        lifeGameService.placePattern(request.patternType());
+        lifeGameService.placePattern(request.patternType(), request.row(), request.col());
         return lifeGameService.getBoard();
     }
 }

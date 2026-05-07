@@ -125,3 +125,23 @@ select {
     max-width: 100%;
     overflow-x: auto;
 }
+
+/* 盤面操作モード選択を置く領域です */
+.action-mode-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+/* 無効化されたセレクトボックスは少し薄く表示します */
+select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 操作補足の短い説明文です */
+.help-text {
+    font-size: 14px;
+    color: #666666;
+}

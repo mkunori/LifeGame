@@ -1,5 +1,6 @@
 package com.mkunori.lifegame.controller;
 
+import com.mkunori.lifegame.model.ActionMode;
 import com.mkunori.lifegame.model.CellEditMode;
 import com.mkunori.lifegame.model.PatternType;
 import com.mkunori.lifegame.service.LifeGameService;
@@ -43,6 +44,7 @@ public class LifeGamePageController {
         model.addAttribute("board", lifeGameService.getBoard());
         model.addAttribute("patternTypes", PatternType.values());
         model.addAttribute("cellEditModes", CellEditMode.values());
+        model.addAttribute("actionModes", ActionMode.values());
         return "lifegame";
     }
 }

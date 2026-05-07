@@ -69,24 +69,38 @@
         <span id="speedValue">300 ms</span>
     </div>
 
-    <!-- セル編集モードを選択する領域です -->
-    <div class="edit-mode-controls">
-        <!-- セル編集モード選択用のラベルです -->
-        <label for="cellEditMode">Edit Mode:</label>
+    <!-- 盤面操作モードを選択する領域です -->
+    <div class="action-mode-controls">
+        <!-- 盤面操作モード選択用のラベルです -->
+        <label for="actionMode">Action Mode:</label>
 
         <!--
-            セル編集モードを選ぶセレクトボックスです。
-            cellEditModesはControllerから渡されたCellEditMode.values()です。
+            盤面操作モードを選ぶセレクトボックスです。
+            actionModesはControllerから渡されたActionMode.values()です。
         -->
-        <select id="cellEditMode" name="cellEditMode">
+        <select id="actionMode" name="actionMode">
             <!--
-                cellEditModesから1つずつmodeを取り出します。
+                actionModesから1つずつmodeを取り出します。
                 valueにはenum名、表示にはdisplayNameを使います。
             -->
+            <option th:each="mode : ${actionModes}" th:value="${mode.name()}" th:text="${mode.displayName}">
+                Action Mode
+            </option>
+        </select>
+    </div>
+
+    <!-- セル編集モードを選択する領域です -->
+    <div class="edit-mode-controls">
+        <label for="cellEditMode">Edit Mode:</label>
+
+        <select id="cellEditMode" name="cellEditMode">
             <option th:each="mode : ${cellEditModes}" th:value="${mode.name()}" th:text="${mode.displayName}">
                 Edit Mode
             </option>
         </select>
+
+        <!-- Place PatternモードではEdit Modeを使わないことを示す説明です -->
+        <span id="editModeHelp" class="help-text"></span>
     </div>
 
     <!-- パターン配置用の操作領域です -->

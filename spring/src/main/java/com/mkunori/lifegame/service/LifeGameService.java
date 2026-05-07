@@ -86,11 +86,13 @@ public class LifeGameService {
     }
 
     /**
-     * 指定されたパターンを盤面中央に配置します。
+     * 指定されたパターンを、指定位置を基準に配置します。
      *
      * @param patternType 配置するパターンの種類
+     * @param row         基準にする行番号
+     * @param col         基準にする列番号
      */
-    public void placePattern(PatternType patternType) {
-        board.placePattern(patternType);
+    public void placePattern(PatternType patternType, int row, int col) {
+        board.placePattern(patternType, row, col);
     }
 }

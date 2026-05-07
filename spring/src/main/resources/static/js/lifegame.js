@@ -65,6 +65,11 @@ const speedValue = document.getElementById("speedValue");
 // 世代数を表示している要素を取得します。
 const generationValue = document.getElementById("generationValue");
 
+// 盤面操作モード選択用のセレクトボックスを取得します。
+const actionModeSelect = document.getElementById("actionMode");
+
+// Edit Modeの補足説明を表示する要素を取得します。
+const editModeHelp = document.getElementById("editModeHelp");
 
 // ==================================================
 // イベント登録
@@ -128,6 +133,11 @@ speedSlider.addEventListener("input", () => {
     changeSpeed(Number(speedSlider.value));
 });
 
+// Action Modeが変更されたとき、関連するUIの有効・無効を切り替えます。
+actionModeSelect.addEventListener("change", () => {
+    updateControlsForActionMode();
+});
+
 
 // ==================================================
 // 自動再生関連
@@ -188,8 +198,8 @@ function changeSpeed(intervalMillis) {
 /**
  * セルのドラッグ操作を開始します。
  *
- * マウスボタンを押したセルを記録し、
- * その後に通過したセルも記録できる状態にします。
+ * Action ModeがEdit Cellの場合はセル編集を開始します。
+ * Action ModeがPlace Patternの場合は、クリック位置にパターンを配置します。
  *
  * @param {MouseEvent} event マウス操作のイベント
  * @param {HTMLButtonElement} button マウスボタンが押されたセルボタン
@@ -197,6 +207,11 @@ function changeSpeed(intervalMillis) {
 function startCellDrag(event, button) {
     // 左クリック以外は処理しません。
     if (event.button !== 0) {
+        return;
+    }
+
+    if (isPlacePatternMode()) {
+        placePatternAtCellByApi(button);
         return;
     }
 
@@ -210,13 +225,12 @@ function startCellDrag(event, button) {
 /**
  * ドラッグ中にセルへ入ったときの処理です。
  *
- * ドラッグ中でなければ何もしません。
- * ドラッグ中であれば、そのセルを1回だけ記録します。
+ * Edit Cellモードでドラッグ中の場合だけ、そのセルを1回だけ記録します。
  *
  * @param {HTMLButtonElement} button ドラッグ中に入ったセルボタン
  */
 function dragOverCell(button) {
-    if (!isDragging) {
+    if (!isDragging || isPlacePatternMode()) {
         return;
     }
 
@@ -329,6 +343,33 @@ function createCellKey(button) {
     return `${button.dataset.row},${button.dataset.col}`;
 }
 
+/**
+ * 現在のAction ModeがPlace Patternかどうかを判定します。
+ *
+ * @return {boolean} Place Patternモードの場合はtrue
+ */
+function isPlacePatternMode() {
+    return actionModeSelect.value === "PLACE_PATTERN";
+}
+
+/**
+ * 現在のAction Modeに合わせて、関連するUIの有効・無効を切り替えます。
+ *
+ * Place PatternモードではEdit Modeは使わないため、
+ * Edit Modeのセレクトボックスを無効化します。
+ */
+function updateControlsForActionMode() {
+    const placePatternMode = isPlacePatternMode();
+
+    cellEditModeSelect.disabled = placePatternMode;
+
+    if (placePatternMode) {
+        editModeHelp.textContent = "Place PatternではEdit Modeは使用しません";
+    } else {
+        editModeHelp.textContent = "";
+    }
+}
+
 // ==================================================
 // API呼び出し関連
 // ==================================================
@@ -355,16 +396,19 @@ async function editCellsByApi(cells) {
 }
 
 /**
- * 選択されたパターンをAPIで盤面中央に配置します。
+ * 指定されたセル位置を基準に、選択中のパターンを配置します。
  *
- * セレクトボックスで選ばれているPatternTypeの値を読み取り、
- * JSONリクエストとしてSpring Boot側のパターン配置APIへ送信します。
+ * @param {HTMLButtonElement} button 配置位置として使うセルボタン
  */
-async function placePatternByApi() {
+async function placePatternAtCellByApi(button) {
     const patternType = patternTypeSelect.value;
+    const row = Number(button.dataset.row);
+    const col = Number(button.dataset.col);
 
     await updateBoardByApi("/lifegame/api/pattern", {
-        patternType: patternType
+        patternType: patternType,
+        row: row,
+        col: col
     });
 }
 
@@ -404,6 +448,48 @@ async function updateBoardByApi(url, requestBody = null) {
         stopAutoPlay();
         console.error("Error while updating LifeGame:", error);
     }
+}
+
+/**
+ * 選択されたパターンをAPIで盤面中央に配置します。
+ *
+ * 盤面上のセルボタンから行数と列数を推定し、中央位置を基準として送信します。
+ */
+async function placePatternByApi() {
+    const patternType = patternTypeSelect.value;
+    const center = calculateBoardCenter();
+
+    await updateBoardByApi("/lifegame/api/pattern", {
+        patternType: patternType,
+        row: center.row,
+        col: center.col
+    });
+}
+
+/**
+ * 現在表示されている盤面の中央セル位置を計算します。
+ *
+ * セルボタンのdata-rowとdata-colをもとに最大行番号・最大列番号を探し、
+ * その中央を返します。
+ *
+ * @return {{row: number, col: number}} 盤面中央のセル位置
+ */
+function calculateBoardCenter() {
+    let maxRow = 0;
+    let maxCol = 0;
+
+    cellButtons.forEach((button) => {
+        const row = Number(button.dataset.row);
+        const col = Number(button.dataset.col);
+
+        maxRow = Math.max(maxRow, row);
+        maxCol = Math.max(maxCol, col);
+    });
+
+    return {
+        row: Math.floor(maxRow / 2),
+        col: Math.floor(maxCol / 2)
+    };
 }
 
 // ==================================================

@@ -194,10 +194,42 @@ public class LifeGameBoard {
      * @param patternType 配置するパターンの種類
      */
     public void placePattern(PatternType patternType) {
-        clear();
-
         int baseRow = rows / 2;
         int baseCol = cols / 2;
+
+        placePattern(patternType, baseRow, baseCol, true);
+    }
+
+    /**
+     * 指定されたパターンを指定位置に配置します。
+     *
+     * 既存のセルは消さず、指定された位置を基準にパターンを追加します。
+     * 世代数は0に戻します。
+     *
+     * @param patternType 配置するパターンの種類
+     * @param baseRow     基準にする行番号
+     * @param baseCol     基準にする列番号
+     */
+    public void placePattern(PatternType patternType, int baseRow, int baseCol) {
+        placePattern(patternType, baseRow, baseCol, false);
+    }
+
+    /**
+     * 指定されたパターンを配置します。
+     *
+     * clearBeforePlaceがtrueの場合は、配置前に盤面をクリアします。
+     * falseの場合は、現在の盤面に追加する形で配置します。
+     *
+     * @param patternType      配置するパターンの種類
+     * @param baseRow          基準にする行番号
+     * @param baseCol          基準にする列番号
+     * @param clearBeforePlace 配置前に盤面をクリアする場合はtrue
+     */
+    private void placePattern(
+            PatternType patternType, int baseRow, int baseCol, boolean clearBeforePlace) {
+        if (clearBeforePlace) {
+            clear();
+        }
 
         switch (patternType) {
             case BLINKER -> placeCells(
@@ -298,6 +330,8 @@ public class LifeGameBoard {
                     baseRow - 4,
                     baseCol - 18);
         }
+
+        generation = 0;
     }
 
     /**
