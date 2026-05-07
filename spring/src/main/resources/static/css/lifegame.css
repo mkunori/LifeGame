@@ -79,6 +79,7 @@ select {
     padding: 8px;
     background-color: #ffffff;
     border: 1px solid #cccccc;
+    user-select: none;
 }
 
 /* 盤面の1行分です */
@@ -96,6 +97,8 @@ select {
     border: 1px solid #dddddd;
     box-sizing: border-box;
     cursor: pointer;
+    user-select: none;
+    touch-action: none;
 }
 
 /* 生きているセルの見た目です */

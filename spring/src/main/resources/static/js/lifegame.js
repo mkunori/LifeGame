@@ -10,6 +10,13 @@ let autoPlayTimerId = null;
 // スライダー操作によって値を変更します。
 let autoPlayIntervalMillis = 300;
 
+// セルをドラッグ中かどうかを表す変数です。
+let isDragging = false;
+
+// 1回のドラッグ操作中に、すでに処理したセルを記録します。
+// 同じセルを何度も反転しないために使います。
+let draggedCellKeys = new Set();
+
 
 // ==================================================
 // HTML要素の取得
@@ -91,11 +98,22 @@ placePatternButton.addEventListener("click", () => {
     placePatternByApi();
 });
 
-// 各セルがクリックされたとき、APIを呼び出してセルの生死を切り替えます。
+// 各セルに、クリックとドラッグ描画用のイベントを登録します。
 cellButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-        toggleCellByApi(button);
+    // マウスボタンを押したセルを反転し、ドラッグ開始状態にします。
+    button.addEventListener("mousedown", (event) => {
+        startCellDrag(event, button);
     });
+
+    // ドラッグ中に別のセルへ入ったら、そのセルを反転します。
+    button.addEventListener("mouseenter", () => {
+        dragOverCell(button);
+    });
+});
+
+// 画面上でマウスボタンを離したら、ドラッグ終了にします。
+document.addEventListener("mouseup", () => {
+    endCellDrag();
 });
 
 // スライダーを動かしたとき、自動再生の速度を変更します。
@@ -156,6 +174,87 @@ function changeSpeed(intervalMillis) {
     }
 }
 
+// ==================================================
+// セルドラッグ操作関連
+// ==================================================
+
+/**
+ * セルのドラッグ操作を開始します。
+ *
+ * マウスボタンを押したセルを反転し、
+ * その後に通過したセルも反転できる状態にします。
+ *
+ * @param {MouseEvent} event マウス操作のイベント
+ * @param {HTMLButtonElement} button マウスボタンが押されたセルボタン
+ */
+function startCellDrag(event, button) {
+    // 左クリック以外は処理しません。
+    if (event.button !== 0) {
+        return;
+    }
+
+    isDragging = true;
+    draggedCellKeys = new Set();
+
+    toggleCellOnceDuringDrag(button);
+}
+
+/**
+ * ドラッグ中にセルへ入ったときの処理です。
+ *
+ * ドラッグ中でなければ何もしません。
+ * ドラッグ中であれば、そのセルを1回だけ反転します。
+ *
+ * @param {HTMLButtonElement} button ドラッグ中に入ったセルボタン
+ */
+function dragOverCell(button) {
+    if (!isDragging) {
+        return;
+    }
+
+    toggleCellOnceDuringDrag(button);
+}
+
+/**
+ * セルのドラッグ操作を終了します。
+ *
+ * マウスボタンが離されたらドラッグ状態を解除し、
+ * 処理済みセルの記録もクリアします。
+ */
+function endCellDrag() {
+    isDragging = false;
+    draggedCellKeys.clear();
+}
+
+/**
+ * 1回のドラッグ操作中に、指定されたセルを1回だけ反転します。
+ *
+ * 同じセルを何度も通過しても、同じドラッグ中は再反転しません。
+ *
+ * @param {HTMLButtonElement} button 反転したいセルボタン
+ */
+function toggleCellOnceDuringDrag(button) {
+    const cellKey = createCellKey(button);
+
+    if (draggedCellKeys.has(cellKey)) {
+        return;
+    }
+
+    draggedCellKeys.add(cellKey);
+    toggleCellByApi(button);
+}
+
+/**
+ * セルを一意に識別するためのキーを作成します。
+ *
+ * 行番号と列番号を組み合わせて、"10,20" のような文字列を作ります。
+ *
+ * @param {HTMLButtonElement} button セルボタン
+ * @return {string} セルを識別するキー
+ */
+function createCellKey(button) {
+    return `${button.dataset.row},${button.dataset.col}`;
+}
 
 // ==================================================
 // API呼び出し関連
