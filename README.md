@@ -50,6 +50,7 @@ Swing版で作成したライフゲームの考え方をもとに、Web画面、
 ### Spring Boot版
 
 - ブラウザ上でのライフゲーム盤面表示
+- 盤面操作モード選択（Edit Cell / Place Pattern）
 - 描画モード選択（Toggle / Draw / Erase）
 
 ## ■ 操作方法
@@ -82,9 +83,23 @@ Swing版で作成したライフゲームの考え方をもとに、Web画面、
 
 ### Spring Boot版
 
-- ドラッグ（Toggle / Draw / Eraseモード）
+- Action Mode プルダウン  
+  盤面クリック時の大きな動作を切り替えます
+  - Edit Cell
+  - Place Pattern
+- Edit Mode プルダウン  
+  Edit Cellモード時のセル編集方法を切り替えます
+  - Toggle
+  - Draw
+  - Erase
+- ドラッグ（Edit Cellモード）  
+  選択中のEdit Modeに応じて、通過したセルをまとめて編集します
+- Pattern プルダウン  
+  配置するパターンを選択します
 - Place  
   選択したパターンを盤面中央に配置します
+- 盤面クリック（Place Patternモード）  
+  選択したパターンをクリック位置に配置します
 
 ## ■ パッケージ構成
 
@@ -113,10 +128,14 @@ spring
 │  ├─ LifeGameSpringApplication.java    // Spring Bootアプリケーションのエントリーポイント
 │  ├─ controller
 │  │  ├─ LifeGamePageController.java    // ライフゲーム画面の表示を担当
-│  │  └─ LifeGameApiController.java     // JavaScriptから呼び出されるAPIを担当
+│  │  ├─ LifeGameApiController.java     // JavaScriptから呼び出されるAPIを担当
+│  │  └─ request                        // JSONリクエストを受け取るrecord群
 │  ├─ model
 │  │  ├─ LifeGameBoard.java             // 盤面状態とライフゲームのルールを管理
-│  │  └─ PatternType.java               // 配置できるパターンの種類を定義
+│  │  ├─ PatternType.java               // 配置できるパターンの種類を定義
+│  │  ├─ CellEditMode.java              // Toggle / Draw / Erase を定義
+│  │  ├─ CellPosition.java              // 盤面上の1つのセル位置を表す値オブジェクト
+│  │  └─ ActionMode.java                // Edit Cell / Place Pattern を定義
 │  └─ service
 │     └─ LifeGameService.java           // ControllerとModelの間で処理を仲介
 └─ src/main/resources
@@ -126,9 +145,11 @@ spring
       ├─ css
       │  └─ lifegame.css                // 画面デザイン
       └─ js
-         └─ lifegame.js                 // ボタン操作、API呼び出し、画面更新を担当
+         ├─ lifegameApi.js              // Spring Boot API呼び出しを担当
+         ├─ lifegameView.js             // 盤面や世代数の画面更新を担当
+         └─ lifegame.js                 // イベント登録、自動再生、ドラッグ操作などを担当
 
-<初期表示の流れ>
+<初期表示>
 ブラウザ
 ↓
 GET /lifegame
@@ -137,8 +158,10 @@ LifeGamePageController
 ↓
 lifegame.html
 
-<画面操作の流れ>
-JavaScript
+<画面操作>
+lifegame.js
+↓
+lifegameApi.js
 ↓
 POST /lifegame/api/...
 ↓
@@ -150,7 +173,7 @@ LifeGameBoard
 ↓
 JSONで盤面データを返す
 ↓
-JavaScriptが画面を更新
+lifegameView.js が画面を更新
 ```
 
 
@@ -195,21 +218,36 @@ classDiagram
     class LifeGameService
     class LifeGameBoard
     class PatternType
+    class CellEditMode
+    class ActionMode
+    class RequestRecords
     class lifegame_html
+    class lifegameApi_js
+    class lifegameView_js
     class lifegame_js
     class lifegame_css
 
     LifeGamePageController --> LifeGameService : gets board
-    LifeGamePageController --> PatternType : provides options
+    LifeGamePageController --> PatternType : provides pattern options
+    LifeGamePageController --> CellEditMode : provides edit modes
+    LifeGamePageController --> ActionMode : provides action modes
     LifeGamePageController --> lifegame_html : returns view
 
     LifeGameApiController --> LifeGameService : updates board
+    LifeGameApiController --> RequestRecords : receives JSON
     LifeGameService --> LifeGameBoard : delegates
+
     LifeGameBoard --> PatternType : places pattern
+    LifeGameBoard --> CellEditMode : edits cells
 
     lifegame_html --> lifegame_css : uses
+    lifegame_html --> lifegameApi_js : loads
+    lifegame_html --> lifegameView_js : loads
     lifegame_html --> lifegame_js : loads
-    lifegame_js --> LifeGameApiController : fetch API
+
+    lifegame_js --> lifegameApi_js : calls API functions
+    lifegame_js --> lifegameView_js : updates view
+    lifegameApi_js --> LifeGameApiController : fetch API
 ```
 
 ## ■ シーケンス図
@@ -332,19 +370,48 @@ sequenceDiagram
     participant User
     participant Browser
     participant JS as lifegame.js
+    participant API as lifegameApi.js
+    participant View as lifegameView.js
     participant ApiController as LifeGameApiController
     participant Service as LifeGameService
     participant Board as LifeGameBoard
 
-    User->>Browser: セルをクリック
-    Browser->>JS: data-row / data-col を取得
-    JS->>ApiController: POST /lifegame/api/toggle?row=...&col=...
-    ApiController->>Service: toggleCell(row, col)
-    Service->>Board: toggleCell(row, col)
-    ApiController->>Service: getBoard()
-    Service-->>ApiController: LifeGameBoard
-    ApiController-->>JS: JSONで盤面データを返す
-    JS->>Browser: セル表示を更新
+    User->>Browser: セルをクリックまたはドラッグ
+    Browser->>JS: mousedown / mouseenter / mouseup
+    JS->>JS: 通過したセル位置を記録
+    JS->>API: editCellsApi(mode, cells)
+    API->>ApiController: POST /lifegame/api/edit-cells
+    ApiController->>Service: editCells(mode, cells)
+    Service->>Board: toggle / draw / erase
+    ApiController-->>API: JSONで盤面データを返す
+    API-->>JS: LifeGameBoard
+    JS->>View: updateBoardView(board)
+    View->>Browser: セル表示とGenerationを更新
+```
+
+#### パターン配置API（クリック位置に配置）
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Browser
+    participant JS as lifegame.js
+    participant API as lifegameApi.js
+    participant View as lifegameView.js
+    participant ApiController as LifeGameApiController
+    participant Service as LifeGameService
+    participant Board as LifeGameBoard
+
+    User->>Browser: Place Patternモードで盤面をクリック
+    Browser->>JS: クリックしたセルのdata-row / data-colを取得
+    JS->>API: placePatternApi(patternType, row, col)
+    API->>ApiController: POST /lifegame/api/pattern
+    ApiController->>Service: placePattern(patternType, row, col)
+    Service->>Board: placePattern(patternType, row, col)
+    ApiController-->>API: JSONで盤面データを返す
+    API-->>JS: LifeGameBoard
+    JS->>View: updateBoardView(board)
+    View->>Browser: 盤面表示を更新
 ```
 
 ## ■ 今後の改善
@@ -356,10 +423,12 @@ sequenceDiagram
 
 ### Spring Boot版
 
-- クリック位置へのパターン配置
-- JavaScriptファイルの責務分離
+- パターン配置時のプレビュー表示
+- パターン配置時のはみ出し表示や配置可否の見える化
 - 盤面サイズ変更機能
 - セッションごとの盤面管理
+- APIリクエスト用recordとModel側の値オブジェクトの整理
+- JavaScriptのさらなる責務分離
 
 ---
 
@@ -377,11 +446,14 @@ sequenceDiagram
 
 - Spring BootによるWebアプリケーション開発
 - Controller / Service / Model の責務分離
+- `@Controller` と `@RestController` の使い分け
 - Thymeleafによる初期画面表示
 - JavaScriptのfetch APIによる非同期通信
 - JSONを使った画面更新
-- `@Controller` と `@RestController` の使い分け
-- `@RequestParam` によるリクエストパラメータの受け取り
-- enumを使ったパターン選択
 - JSONリクエストを `@RequestBody` と record で受け取る実装
+- enumを使ったパターン選択、操作モード、編集モードの管理
 - ドラッグ描画時に複数セルをまとめて送信するAPI設計
+- JavaScriptファイルの責務分離
+  - API呼び出し
+  - 画面更新
+  - イベント制御
