@@ -17,6 +17,10 @@ let isDragging = false;
 // 同じセルを何度も反転しないために使います。
 let draggedCellKeys = new Set();
 
+// 1回のドラッグ操作中に通過したセル位置を記録します。
+// マウスを離したときに、まとめてAPIへ送信します。
+let draggedCells = [];
+
 
 // ==================================================
 // HTML要素の取得
@@ -181,8 +185,8 @@ function changeSpeed(intervalMillis) {
 /**
  * セルのドラッグ操作を開始します。
  *
- * マウスボタンを押したセルを反転し、
- * その後に通過したセルも反転できる状態にします。
+ * マウスボタンを押したセルを記録し、
+ * その後に通過したセルも記録できる状態にします。
  *
  * @param {MouseEvent} event マウス操作のイベント
  * @param {HTMLButtonElement} button マウスボタンが押されたセルボタン
@@ -195,15 +199,16 @@ function startCellDrag(event, button) {
 
     isDragging = true;
     draggedCellKeys = new Set();
+    draggedCells = [];
 
-    toggleCellOnceDuringDrag(button);
+    addCellOnceDuringDrag(button);
 }
 
 /**
  * ドラッグ中にセルへ入ったときの処理です。
  *
  * ドラッグ中でなければ何もしません。
- * ドラッグ中であれば、そのセルを1回だけ反転します。
+ * ドラッグ中であれば、そのセルを1回だけ記録します。
  *
  * @param {HTMLButtonElement} button ドラッグ中に入ったセルボタン
  */
@@ -212,28 +217,39 @@ function dragOverCell(button) {
         return;
     }
 
-    toggleCellOnceDuringDrag(button);
+    addCellOnceDuringDrag(button);
 }
 
 /**
  * セルのドラッグ操作を終了します。
  *
  * マウスボタンが離されたらドラッグ状態を解除し、
- * 処理済みセルの記録もクリアします。
+ * 記録したセルをまとめてAPIへ送信します。
  */
 function endCellDrag() {
+    if (!isDragging) {
+        return;
+    }
+
     isDragging = false;
+
+    if (draggedCells.length > 0) {
+        toggleCellsByApi(draggedCells);
+    }
+
     draggedCellKeys.clear();
+    draggedCells = [];
 }
 
 /**
- * 1回のドラッグ操作中に、指定されたセルを1回だけ反転します。
+ * 1回のドラッグ操作中に、指定されたセルを1回だけ記録します。
  *
- * 同じセルを何度も通過しても、同じドラッグ中は再反転しません。
+ * 同じセルを何度も通過しても、同じドラッグ中は再記録しません。
+ * 実際のAPI送信は、マウスを離したタイミングでまとめて行います。
  *
- * @param {HTMLButtonElement} button 反転したいセルボタン
+ * @param {HTMLButtonElement} button 記録したいセルボタン
  */
-function toggleCellOnceDuringDrag(button) {
+function addCellOnceDuringDrag(button) {
     const cellKey = createCellKey(button);
 
     if (draggedCellKeys.has(cellKey)) {
@@ -241,7 +257,28 @@ function toggleCellOnceDuringDrag(button) {
     }
 
     draggedCellKeys.add(cellKey);
-    toggleCellByApi(button);
+
+    draggedCells.push({
+        row: Number(button.dataset.row),
+        col: Number(button.dataset.col)
+    });
+
+    toggleCellViewOnly(button);
+}
+
+/**
+ * セルの見た目だけを反転します。
+ *
+ * APIの結果を待たずに、ドラッグ中の操作感を軽くするために使います。
+ * 最終的にはAPIから返ってきた盤面データで画面全体を正しい状態に更新します。
+ *
+ * @param {HTMLButtonElement} button 見た目を反転したいセルボタン
+ */
+function toggleCellViewOnly(button) {
+    const isAlive = button.classList.contains("alive");
+
+    button.classList.toggle("alive", !isAlive);
+    button.classList.toggle("dead", isAlive);
 }
 
 /**
@@ -268,20 +305,13 @@ async function stepByApi() {
 }
 
 /**
- * 指定されたセルボタンの行番号・列番号を使って、セルの生死を切り替えます。
+ * 指定された複数セルの生死を、APIでまとめて切り替えます。
  *
- * セルボタンに設定されているdata-rowとdata-colを読み取り、
- * JSONリクエストとしてSpring Boot側のtoggle APIへ送信します。
- *
- * @param {HTMLButtonElement} button クリックされたセルボタン
+ * @param {{row: number, col: number}[]} cells 切り替えるセル位置の一覧
  */
-async function toggleCellByApi(button) {
-    const row = Number(button.dataset.row);
-    const col = Number(button.dataset.col);
-
-    await updateBoardByApi("/lifegame/api/toggle", {
-        row: row,
-        col: col
+async function toggleCellsByApi(cells) {
+    await updateBoardByApi("/lifegame/api/toggle-cells", {
+        cells: cells
     });
 }
 
@@ -336,7 +366,6 @@ async function updateBoardByApi(url, requestBody = null) {
         console.error("Error while updating LifeGame:", error);
     }
 }
-
 
 // ==================================================
 // 画面更新関連

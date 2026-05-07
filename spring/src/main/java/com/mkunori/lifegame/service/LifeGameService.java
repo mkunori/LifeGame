@@ -1,7 +1,11 @@
 package com.mkunori.lifegame.service;
 
+import com.mkunori.lifegame.controller.request.CellPositionRequest;
 import com.mkunori.lifegame.model.LifeGameBoard;
 import com.mkunori.lifegame.model.PatternType;
+
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 /**
@@ -60,6 +64,17 @@ public class LifeGameService {
      */
     public void toggleCell(int row, int col) {
         board.toggleCell(row, col);
+    }
+
+    /**
+     * 指定された複数セルの生死をまとめて切り替えます。
+     *
+     * @param cells 切り替えるセル位置の一覧
+     */
+    public void toggleCells(List<CellPositionRequest> cells) {
+        for (CellPositionRequest cell : cells) {
+            board.toggleCell(cell.row(), cell.col());
+        }
     }
 
     /**
