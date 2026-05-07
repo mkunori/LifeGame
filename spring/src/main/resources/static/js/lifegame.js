@@ -1,3 +1,7 @@
+// ==================================================
+// 状態変数
+// ==================================================
+
 // 自動再生のタイマーIDを保存する変数です。
 // null のときは自動再生していない状態です。
 let autoPlayTimerId = null;
@@ -5,6 +9,11 @@ let autoPlayTimerId = null;
 // 自動再生の間隔です。
 // スライダー操作によって値を変更します。
 let autoPlayIntervalMillis = 300;
+
+
+// ==================================================
+// HTML要素の取得
+// ==================================================
 
 // Stepボタンを取得します。
 const stepButton = document.getElementById("stepButton");
@@ -41,6 +50,11 @@ const speedValue = document.getElementById("speedValue");
 
 // 世代数を表示している要素を取得します。
 const generationValue = document.getElementById("generationValue");
+
+
+// ==================================================
+// イベント登録
+// ==================================================
 
 // Stepボタンが押されたとき、APIを呼び出して1世代進めます。
 stepButton.addEventListener("click", () => {
@@ -88,6 +102,11 @@ cellButtons.forEach((button) => {
 speedSlider.addEventListener("input", () => {
     changeSpeed(Number(speedSlider.value));
 });
+
+
+// ==================================================
+// 自動再生関連
+// ==================================================
 
 /**
  * 自動再生を開始します。
@@ -137,11 +156,13 @@ function changeSpeed(intervalMillis) {
     }
 }
 
+
+// ==================================================
+// API呼び出し関連
+// ==================================================
+
 /**
  * Spring Boot側のAPIを呼び出して、盤面を1世代進めます。
- *
- * APIから返ってきた盤面データを使って、
- * HTML上のセル表示と世代数表示を更新します。
  */
 async function stepByApi() {
     await updateBoardByApi("/lifegame/api/step");
@@ -149,9 +170,6 @@ async function stepByApi() {
 
 /**
  * 指定されたセルボタンの行番号・列番号を使って、セルの生死を切り替えます。
- *
- * セルボタンに設定されているdata-rowとdata-colを読み取り、
- * Spring Boot側のtoggle APIへ送信します。
  *
  * @param {HTMLButtonElement} button クリックされたセルボタン
  */
@@ -163,9 +181,18 @@ async function toggleCellByApi(button) {
 }
 
 /**
+ * 選択されたパターンをAPIで盤面中央に配置します。
+ */
+async function placePatternByApi() {
+    const patternType = patternTypeSelect.value;
+
+    await updateBoardByApi(`/lifegame/api/pattern?patternType=${patternType}`);
+}
+
+/**
  * 指定されたAPIを呼び出して、返ってきた盤面データを画面へ反映します。
  *
- * Step、Clear、Reset、Random、Toggleなど、
+ * Step、Clear、Reset、Random、Toggle、Pattern配置など、
  * 盤面を更新してLifeGameBoardを返すAPIで共通利用します。
  *
  * @param {string} url 呼び出すAPIのURL
@@ -190,17 +217,10 @@ async function updateBoardByApi(url) {
     }
 }
 
-/**
- * 選択されたパターンをAPIで盤面中央に配置します。
- *
- * セレクトボックスで選ばれているPatternTypeの値を読み取り、
- * Spring Boot側のパターン配置APIへ送信します。
- */
-async function placePatternByApi() {
-    const patternType = patternTypeSelect.value;
 
-    await updateBoardByApi(`/lifegame/api/pattern?patternType=${patternType}`);
-}
+// ==================================================
+// 画面更新関連
+// ==================================================
 
 /**
  * APIから受け取った盤面データを画面に反映します。
