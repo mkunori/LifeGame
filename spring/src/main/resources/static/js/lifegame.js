@@ -270,37 +270,58 @@ async function stepByApi() {
 /**
  * 指定されたセルボタンの行番号・列番号を使って、セルの生死を切り替えます。
  *
+ * セルボタンに設定されているdata-rowとdata-colを読み取り、
+ * JSONリクエストとしてSpring Boot側のtoggle APIへ送信します。
+ *
  * @param {HTMLButtonElement} button クリックされたセルボタン
  */
 async function toggleCellByApi(button) {
     const row = Number(button.dataset.row);
     const col = Number(button.dataset.col);
 
-    await updateBoardByApi(`/lifegame/api/toggle?row=${row}&col=${col}`);
+    await updateBoardByApi("/lifegame/api/toggle", {
+        row: row,
+        col: col
+    });
 }
 
 /**
  * 選択されたパターンをAPIで盤面中央に配置します。
+ *
+ * セレクトボックスで選ばれているPatternTypeの値を読み取り、
+ * JSONリクエストとしてSpring Boot側のパターン配置APIへ送信します。
  */
 async function placePatternByApi() {
     const patternType = patternTypeSelect.value;
 
-    await updateBoardByApi(`/lifegame/api/pattern?patternType=${patternType}`);
+    await updateBoardByApi("/lifegame/api/pattern", {
+        patternType: patternType
+    });
 }
 
 /**
  * 指定されたAPIを呼び出して、返ってきた盤面データを画面へ反映します。
  *
- * Step、Clear、Reset、Random、Toggle、Pattern配置など、
- * 盤面を更新してLifeGameBoardを返すAPIで共通利用します。
+ * requestBodyを渡した場合は、JSONとしてSpring Boot側へ送信します。
+ * requestBodyを省略した場合は、POSTだけを送信します。
  *
  * @param {string} url 呼び出すAPIのURL
+ * @param {object|null} requestBody APIへ送るJSONデータ
  */
-async function updateBoardByApi(url) {
+async function updateBoardByApi(url, requestBody = null) {
     try {
-        const response = await fetch(url, {
+        const options = {
             method: "POST"
-        });
+        };
+
+        if (requestBody !== null) {
+            options.headers = {
+                "Content-Type": "application/json"
+            };
+            options.body = JSON.stringify(requestBody);
+        }
+
+        const response = await fetch(url, options);
 
         if (!response.ok) {
             stopAutoPlay();

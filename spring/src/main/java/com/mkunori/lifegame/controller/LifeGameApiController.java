@@ -1,10 +1,11 @@
 package com.mkunori.lifegame.controller;
 
+import com.mkunori.lifegame.controller.request.PlacePatternRequest;
+import com.mkunori.lifegame.controller.request.ToggleCellRequest;
 import com.mkunori.lifegame.model.LifeGameBoard;
-import com.mkunori.lifegame.model.PatternType;
 import com.mkunori.lifegame.service.LifeGameService;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -78,27 +79,30 @@ public class LifeGameApiController {
     /**
      * 指定されたセルの生死を切り替えて、更新後の盤面データを返します。
      *
-     * rowとcolで指定されたセルを反転します。
+     * JavaScriptから送られてきたJSONリクエストを受け取り、
+     * requestに含まれる行番号と列番号のセルを反転します。
      *
-     * @param row 切り替えるセルの行番号
-     * @param col 切り替えるセルの列番号
+     * @param request 切り替えるセルの位置を含むリクエスト
      * @return 更新後のライフゲーム盤面
      */
     @PostMapping("/lifegame/api/toggle")
-    public LifeGameBoard toggle(@RequestParam int row, @RequestParam int col) {
-        lifeGameService.toggleCell(row, col);
+    public LifeGameBoard toggle(@RequestBody ToggleCellRequest request) {
+        lifeGameService.toggleCell(request.row(), request.col());
         return lifeGameService.getBoard();
     }
 
     /**
      * 選択されたパターンを盤面中央に配置して、更新後の盤面データを返します。
      *
-     * @param patternType 配置するパターンの種類
+     * JavaScriptから送られてきたJSONリクエストを受け取り、
+     * requestに含まれるパターン種別を盤面中央へ配置します。
+     *
+     * @param request 配置するパターンの種類を含むリクエスト
      * @return 更新後のライフゲーム盤面
      */
     @PostMapping("/lifegame/api/pattern")
-    public LifeGameBoard placePattern(@RequestParam PatternType patternType) {
-        lifeGameService.placePattern(patternType);
+    public LifeGameBoard placePattern(@RequestBody PlacePatternRequest request) {
+        lifeGameService.placePattern(request.patternType());
         return lifeGameService.getBoard();
     }
 }
