@@ -155,7 +155,12 @@ public class LifeGameBoard {
      * 盤面上のすべてのセルを死んだ状態にします。
      */
     public void clear() {
-        cells = new boolean[rows][cols];
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                cells[row][col] = false;
+            }
+        }
+
         generation = 0;
     }
 
@@ -174,11 +179,12 @@ public class LifeGameBoard {
      * 盤面上のセルをランダムに生きた状態または死んだ状態にします。
      *
      * 現在は、およそ4分の1の確率でセルが生きるようにしています。
+     * ランダム配置は新しい初期状態として扱うため、世代数を0に戻します。
      */
     public void randomize() {
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                cells[row][col] = random.nextInt(4) == 0;
+                cells[row][col] = Math.random() < 0.3;
             }
         }
 

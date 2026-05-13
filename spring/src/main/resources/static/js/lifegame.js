@@ -104,20 +104,26 @@ stopButton.addEventListener("click", () => {
     stopAutoPlay();
 });
 
-// Clearボタンが押されたとき、APIを呼び出して盤面をクリアします。
+// Clearボタンが押されたとき、自動再生を停止して盤面をクリアします。
 clearButton.addEventListener("click", async () => {
+    stopAutoPlay();
+
     const board = await clearBoardApi();
     applyBoardIfAvailable(board);
 });
 
-// Resetボタンが押されたとき、APIを呼び出して初期状態へ戻します。
+// Resetボタンが押されたとき、自動再生を停止して初期状態へ戻します。
 resetButton.addEventListener("click", async () => {
+    stopAutoPlay();
+
     const board = await resetBoardApi();
     applyBoardIfAvailable(board);
 });
 
-// Randomボタンが押されたとき、APIを呼び出してランダム配置します。
+// Randomボタンが押されたとき、自動再生を停止してランダム配置します。
 randomButton.addEventListener("click", async () => {
+    stopAutoPlay();
+
     const board = await randomizeBoardApi();
     applyBoardIfAvailable(board);
 });
