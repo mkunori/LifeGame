@@ -133,9 +133,6 @@ const randomButton = document.getElementById("randomButton");
 // パターン選択用のセレクトボックスを取得します。
 const patternTypeSelect = document.getElementById("patternType");
 
-// パターン配置ボタンを取得します。
-const placePatternButton = document.getElementById("placePatternButton");
-
 // セル編集モード選択用のセレクトボックスを取得します。
 const cellEditModeSelect = document.getElementById("cellEditMode");
 
@@ -159,6 +156,9 @@ const generationValue = document.getElementById("generationValue");
 
 // 盤面全体の要素を取得します。
 const boardElement = document.querySelector(".board");
+
+// Patternの補足説明を表示する要素を取得します。
+const patternHelp = document.getElementById("patternHelp");
 
 // ==================================================
 // イベント登録
@@ -195,11 +195,6 @@ resetButton.addEventListener("click", async () => {
 randomButton.addEventListener("click", async () => {
     const board = await randomizeBoardApi();
     applyBoardIfAvailable(board);
-});
-
-// Placeボタンが押されたとき、選択されたパターンを盤面中央に配置します。
-placePatternButton.addEventListener("click", () => {
-    placePatternByApi();
 });
 
 // 各セルに、クリック、ドラッグ描画、パターンプレビュー用のイベントを登録します。
@@ -452,21 +447,23 @@ function isPlacePatternMode() {
 /**
  * 現在のAction Modeに合わせて、関連するUIの有効・無効を切り替えます。
  *
- * Place PatternモードではEdit Modeは使わないため、
- * Edit Modeのセレクトボックスを無効化します。
+ * Edit CellモードではEdit Modeを使い、Patternは使いません。
+ * Place PatternモードではPatternを使い、Edit Modeは使いません。
  */
 function updateControlsForActionMode() {
     const placePatternMode = isPlacePatternMode();
 
     cellEditModeSelect.disabled = placePatternMode;
+    patternTypeSelect.disabled = !placePatternMode;
 
     if (placePatternMode) {
         editModeHelp.textContent = "Place PatternではEdit Modeは使用しません";
+        patternHelp.textContent = "";
     } else {
         editModeHelp.textContent = "";
+        patternHelp.textContent = "Place Patternのときだけ使用します";
     }
 }
-
 
 // ==================================================
 // API呼び出しの利用処理
@@ -508,20 +505,6 @@ async function placePatternAtCellByApi(button) {
 }
 
 /**
- * 選択されたパターンをAPIで盤面中央に配置します。
- *
- * 盤面上のセルボタンから行数と列数を推定し、中央位置を基準として送信します。
- */
-async function placePatternByApi() {
-    const patternType = patternTypeSelect.value;
-    const center = calculateBoardCenter();
-    const board = await placePatternApi(patternType, center.row, center.col);
-
-    clearPatternPreview();
-    applyBoardIfAvailable(board);
-}
-
-/**
  * APIから受け取った盤面データがあれば画面に反映します。
  *
  * API呼び出しに失敗してnullが返ってきた場合は、
@@ -536,32 +519,6 @@ function applyBoardIfAvailable(board) {
     }
 
     updateBoardView(board, generationValue, cellButtons);
-}
-
-/**
- * 現在表示されている盤面の中央セル位置を計算します。
- *
- * セルボタンのdata-rowとdata-colをもとに最大行番号・最大列番号を探し、
- * その中央を返します。
- *
- * @return {{row: number, col: number}} 盤面中央のセル位置
- */
-function calculateBoardCenter() {
-    let maxRow = 0;
-    let maxCol = 0;
-
-    cellButtons.forEach((button) => {
-        const row = Number(button.dataset.row);
-        const col = Number(button.dataset.col);
-
-        maxRow = Math.max(maxRow, row);
-        maxCol = Math.max(maxCol, col);
-    });
-
-    return {
-        row: Math.floor(maxRow / 2),
-        col: Math.floor(maxCol / 2)
-    };
 }
 
 // ==================================================

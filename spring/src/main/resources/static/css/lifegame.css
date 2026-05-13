@@ -55,6 +55,7 @@ h1 {
 /* パターン配置の操作部品を横並びにします */
 .pattern-controls {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 8px;
     margin-bottom: 16px;

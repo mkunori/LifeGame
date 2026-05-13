@@ -41,11 +41,12 @@ Swing版で作成したライフゲームの考え方をもとに、Web画面、
   - Toad
   - Beacon
   - Gosper Glider Gun
+- クリック位置へのパターン配置
+- パターン配置時のプレビュー表示
 
 ### Swing版
 
 - 状態表示（Running / Stopped）
-- プレビュー機能
 
 ### Spring Boot版
 
@@ -94,12 +95,8 @@ Swing版で作成したライフゲームの考え方をもとに、Web画面、
   - Erase
 - ドラッグ（Edit Cellモード）  
   選択中のEdit Modeに応じて、通過したセルをまとめて編集します
-- Pattern プルダウン  
-  配置するパターンを選択します
-- Place  
-  選択したパターンを盤面中央に配置します
-- 盤面クリック（Place Patternモード）  
-  選択したパターンをクリック位置に配置します
+- Action Mode: Place Pattern  
+  Patternプルダウンで選択したパターンを、クリックした位置に配置します
 
 ## ■ パッケージ構成
 

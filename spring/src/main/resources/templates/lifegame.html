@@ -110,7 +110,7 @@
 
         <!--
             パターンを選ぶセレクトボックスです。
-            patternTypesはControllerから渡されたPatternType.values()です。
+            Place Patternモードのときだけ使用します。
         -->
         <select id="patternType" name="patternType">
             <!--
@@ -122,11 +122,8 @@
             </option>
         </select>
 
-        <!--
-            選択したパターンを中央に配置するボタンです。
-            JavaScriptでAPIを呼び出し、画面を再読み込みせずに配置します。
-        -->
-        <button type="button" id="placePatternButton" class="control-button">Place</button>
+        <!-- Place Patternモード以外ではPatternを使わないことを示す説明です -->
+        <span id="patternHelp" class="help-text"></span>
     </div>
 
     <!-- 盤面の状態を表示する領域です -->
