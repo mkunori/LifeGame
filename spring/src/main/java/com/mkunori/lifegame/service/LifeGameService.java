@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class LifeGameService {
 
-    private final LifeGameBoard board = new LifeGameBoard(40, 70);
+    private final LifeGameBoard board = new LifeGameBoard(60, 100);
 
     /**
      * 現在の盤面を返します。

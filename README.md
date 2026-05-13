@@ -34,13 +34,6 @@ Swing版で作成したライフゲームの考え方をもとに、Web画面、
 - 初期状態へのリセット（Reset）
 - 更新速度の変更（Speed スライダー）
 - 世代数表示（Generation）
-- パターン配置
-  - Glider
-  - Block
-  - Blinker
-  - Toad
-  - Beacon
-  - Gosper Glider Gun
 - クリック位置へのパターン配置
 - パターン配置時のプレビュー表示
 
@@ -463,7 +456,6 @@ sequenceDiagram
 - 盤面サイズ変更機能
 - セッションごとの盤面管理
 - APIリクエスト用recordとModel側の値オブジェクトの整理
-- パターン定義をJavaScriptとJavaで二重管理しない構成への改善
 - JavaScriptのさらなる責務分離
 - レスポンシブ表示の改善
 
