@@ -29,6 +29,10 @@ let previewCellButtons = [];
 // keyはPatternTypeのenum名、valueはパターン定義です。
 let patternDefinitions = {};
 
+// パターン定義をJava側から取得できたかどうかを表します。
+// false の場合は、Place Pattern関連の操作を無効化します。
+let patternDefinitionsLoaded = false;
+
 // ==================================================
 // HTML要素の取得
 // ==================================================
@@ -185,6 +189,8 @@ async function loadPatternDefinitions() {
 
     if (definitions === null) {
         console.error("Pattern definitions could not be loaded.");
+        patternDefinitions = {};
+        patternDefinitionsLoaded = false;
         return;
     }
 
@@ -193,6 +199,8 @@ async function loadPatternDefinitions() {
     definitions.forEach((definition) => {
         patternDefinitions[definition.patternType] = definition;
     });
+
+    patternDefinitionsLoaded = true;
 }
 
 // ==================================================
@@ -398,12 +406,20 @@ function isPlacePatternMode() {
  *
  * Edit CellモードではEdit Modeを使い、Patternは使いません。
  * Place PatternモードではPatternを使い、Edit Modeは使いません。
+ * パターン定義を取得できていない場合は、Pattern操作を無効化します。
  */
 function updateControlsForActionMode() {
     const placePatternMode = isPlacePatternMode();
 
     cellEditModeSelect.disabled = placePatternMode;
-    patternTypeSelect.disabled = !placePatternMode;
+    patternTypeSelect.disabled = !placePatternMode || !patternDefinitionsLoaded;
+
+    if (!patternDefinitionsLoaded) {
+        editModeHelp.textContent = "";
+        patternHelp.textContent = "パターン定義を取得できませんでした";
+        clearPatternPreview();
+        return;
+    }
 
     if (placePatternMode) {
         editModeHelp.textContent = "Place PatternではEdit Modeは使用しません";
@@ -442,11 +458,16 @@ async function editCellsByApi(cells) {
 /**
  * 指定されたセル位置を基準に、選択中のパターンを配置します。
  *
+ * パターン定義を取得できていない場合や、
  * パターンが盤面外にはみ出す場合は配置しません。
  *
  * @param {HTMLButtonElement} button 配置位置として使うセルボタン
  */
 async function placePatternAtCellByApi(button) {
+    if (!patternDefinitionsLoaded) {
+        return;
+    }
+
     if (!canPlacePatternAt(button)) {
         return;
     }
@@ -484,15 +505,15 @@ function applyBoardIfAvailable(board) {
 /**
  * 指定されたセルを基準に、選択中パターンのプレビューを表示します。
  *
- * Place Patternモードでない場合は、プレビューを消して何もしません。
- * 通常は青色、既存セルと重なる場合は黄色、盤面外にはみ出す場合は赤色で表示します。
+ * Place Patternモードでない場合やパターン定義を取得できていない場合は、
+ * プレビューを消して何もしません。
  *
  * @param {HTMLButtonElement} baseButton 基準にするセルボタン
  */
 function updatePatternPreview(baseButton) {
     clearPatternPreview();
 
-    if (!isPlacePatternMode()) {
+    if (!isPlacePatternMode() || !patternDefinitionsLoaded) {
         return;
     }
 
@@ -606,12 +627,17 @@ function clearPatternPreview() {
 /**
  * 指定されたセル位置を基準に、選択中パターンを配置できるか判定します。
  *
+ * パターン定義を取得できていない場合や、
  * パターンが盤面からはみ出す場合はfalseを返します。
  *
  * @param {HTMLButtonElement} baseButton 基準にするセルボタン
  * @return {boolean} 配置できる場合はtrue
  */
 function canPlacePatternAt(baseButton) {
+    if (!patternDefinitionsLoaded) {
+        return false;
+    }
+
     const patternType = patternTypeSelect.value;
     const patternDefinition = patternDefinitions[patternType];
 
