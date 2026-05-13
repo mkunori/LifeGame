@@ -114,6 +114,13 @@ select {
     background-color: #ffffff;
 }
 
+/* パターン配置プレビュー中のセルです */
+.cell.preview {
+    outline: 2px solid rgba(0, 120, 255, 0.8);
+    outline-offset: -2px;
+    background-color: rgba(0, 120, 255, 0.35);
+}
+
 /* セルにフォーカスが当たったときの見た目です */
 .cell:focus {
     outline: 1px solid #666666;

@@ -21,6 +21,92 @@ let draggedCellKeys = new Set();
 // マウスを離したときに、まとめてAPIへ送信します。
 let draggedCells = [];
 
+// 現在プレビュー表示しているセルを記録します。
+// プレビューを消すときに使います。
+let previewCellButtons = [];
+
+// ==================================================
+// プレビュー用パターン定義
+// ==================================================
+
+// パターン配置プレビューで使う相対座標です。
+// Java側のPatternType / LifeGameBoardにある配置座標と対応させています。
+const patternOffsets = {
+    BLINKER: [
+        [0, -1],
+        [0, 0],
+        [0, 1]
+    ],
+    BLOCK: [
+        [0, 0],
+        [0, 1],
+        [1, 0],
+        [1, 1]
+    ],
+    GLIDER: [
+        [0, 1],
+        [1, 2],
+        [2, 0],
+        [2, 1],
+        [2, 2]
+    ],
+    TOAD: [
+        [0, 1],
+        [0, 2],
+        [0, 3],
+        [1, 0],
+        [1, 1],
+        [1, 2]
+    ],
+    BEACON: [
+        [0, 0],
+        [0, 1],
+        [1, 0],
+        [1, 1],
+        [2, 2],
+        [2, 3],
+        [3, 2],
+        [3, 3]
+    ],
+    GOSPER_GLIDER_GUN: [
+        [0, 24],
+        [1, 22],
+        [1, 24],
+        [2, 12],
+        [2, 13],
+        [2, 20],
+        [2, 21],
+        [2, 34],
+        [2, 35],
+        [3, 11],
+        [3, 15],
+        [3, 20],
+        [3, 21],
+        [3, 34],
+        [3, 35],
+        [4, 0],
+        [4, 1],
+        [4, 10],
+        [4, 16],
+        [4, 20],
+        [4, 21],
+        [5, 0],
+        [5, 1],
+        [5, 10],
+        [5, 14],
+        [5, 16],
+        [5, 17],
+        [5, 22],
+        [5, 24],
+        [6, 10],
+        [6, 16],
+        [6, 24],
+        [7, 11],
+        [7, 15],
+        [8, 12],
+        [8, 13]
+    ]
+};
 
 // ==================================================
 // HTML要素の取得
@@ -71,6 +157,8 @@ const speedValue = document.getElementById("speedValue");
 // 世代数を表示している要素を取得します。
 const generationValue = document.getElementById("generationValue");
 
+// 盤面全体の要素を取得します。
+const boardElement = document.querySelector(".board");
 
 // ==================================================
 // イベント登録
@@ -114,7 +202,7 @@ placePatternButton.addEventListener("click", () => {
     placePatternByApi();
 });
 
-// 各セルに、クリックとドラッグ描画用のイベントを登録します。
+// 各セルに、クリック、ドラッグ描画、パターンプレビュー用のイベントを登録します。
 cellButtons.forEach((button) => {
     // マウスボタンを押したセルを編集し、ドラッグ開始状態にします。
     button.addEventListener("mousedown", (event) => {
@@ -122,8 +210,10 @@ cellButtons.forEach((button) => {
     });
 
     // ドラッグ中に別のセルへ入ったら、そのセルを編集します。
+    // Place Patternモードの場合は、プレビュー位置を更新します。
     button.addEventListener("mouseenter", () => {
         dragOverCell(button);
+        updatePatternPreview(button);
     });
 });
 
@@ -137,11 +227,21 @@ speedSlider.addEventListener("input", () => {
     changeSpeed(Number(speedSlider.value));
 });
 
-// Action Modeが変更されたとき、関連するUIの有効・無効を切り替えます。
+// Action Modeが変更されたとき、関連するUIの有効・無効を切り替え、プレビューを消します。
 actionModeSelect.addEventListener("change", () => {
     updateControlsForActionMode();
+    clearPatternPreview();
 });
 
+// Patternが変更されたとき、古いパターンプレビューを消します。
+patternTypeSelect.addEventListener("change", () => {
+    clearPatternPreview();
+});
+
+// 盤面からマウスが出たら、パターンプレビューを消します。
+boardElement.addEventListener("mouseleave", () => {
+    clearPatternPreview();
+});
 
 // ==================================================
 // 初期化
@@ -403,6 +503,7 @@ async function placePatternAtCellByApi(button) {
     const col = Number(button.dataset.col);
     const board = await placePatternApi(patternType, row, col);
 
+    clearPatternPreview();
     applyBoardIfAvailable(board);
 }
 
@@ -416,6 +517,7 @@ async function placePatternByApi() {
     const center = calculateBoardCenter();
     const board = await placePatternApi(patternType, center.row, center.col);
 
+    clearPatternPreview();
     applyBoardIfAvailable(board);
 }
 
@@ -459,5 +561,96 @@ function calculateBoardCenter() {
     return {
         row: Math.floor(maxRow / 2),
         col: Math.floor(maxCol / 2)
+    };
+}
+
+// ==================================================
+// パターンプレビュー関連
+// ==================================================
+
+/**
+ * 指定されたセルを基準に、選択中パターンのプレビューを表示します。
+ *
+ * Place Patternモードでない場合は、プレビューを消して何もしません。
+ * 未定義のパターンが選ばれている場合も、何もしません。
+ *
+ * @param {HTMLButtonElement} baseButton 基準にするセルボタン
+ */
+function updatePatternPreview(baseButton) {
+    clearPatternPreview();
+
+    if (!isPlacePatternMode()) {
+        return;
+    }
+
+    const patternType = patternTypeSelect.value;
+    const offsets = patternOffsets[patternType];
+
+    if (offsets === undefined) {
+        return;
+    }
+
+    const baseRow = Number(baseButton.dataset.row);
+    const baseCol = Number(baseButton.dataset.col);
+    const adjustedBase = adjustPatternBase(patternType, baseRow, baseCol);
+
+    offsets.forEach((offset) => {
+        const row = adjustedBase.row + offset[0];
+        const col = adjustedBase.col + offset[1];
+        const button = findCellButton(row, col);
+
+        if (button !== null) {
+            button.classList.add("preview");
+            previewCellButtons.push(button);
+        }
+    });
+}
+
+/**
+ * 現在表示しているパターンプレビューを消します。
+ */
+function clearPatternPreview() {
+    previewCellButtons.forEach((button) => {
+        button.classList.remove("preview");
+    });
+
+    previewCellButtons = [];
+}
+
+/**
+ * 指定された行番号・列番号に対応するセルボタンを探します。
+ *
+ * 見つからない場合はnullを返します。
+ *
+ * @param {number} row 行番号
+ * @param {number} col 列番号
+ * @return {HTMLButtonElement|null} 対応するセルボタン
+ */
+function findCellButton(row, col) {
+    return document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+}
+
+/**
+ * パターンごとに、プレビュー表示で使う基準位置を調整します。
+ *
+ * Gosper Glider Gunは横長のため、Java側の配置処理と同じように
+ * 基準位置を少し左上へずらしています。
+ *
+ * @param {string} patternType パターン種別
+ * @param {number} baseRow 元の基準行
+ * @param {number} baseCol 元の基準列
+ * @return {{row: number, col: number}} 調整後の基準位置
+ */
+function adjustPatternBase(patternType, baseRow, baseCol) {
+    if (patternType === "GOSPER_GLIDER_GUN") {
+        return {
+            row: baseRow - 4,
+            col: baseCol - 18
+        };
+    }
+
+    return {
+        row: baseRow,
+        col: baseCol
     };
 }
