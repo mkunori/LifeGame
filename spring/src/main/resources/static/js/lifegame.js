@@ -536,7 +536,7 @@ function applyBoardIfAvailable(board) {
  * 指定されたセルを基準に、選択中パターンのプレビューを表示します。
  *
  * Place Patternモードでない場合は、プレビューを消して何もしません。
- * パターンが盤面内に収まる場合は青色、はみ出す場合は赤色で表示します。
+ * 通常は青色、既存セルと重なる場合は黄色、盤面外にはみ出す場合は赤色で表示します。
  *
  * @param {HTMLButtonElement} baseButton 基準にするセルボタン
  */
@@ -558,9 +558,7 @@ function updatePatternPreview(baseButton) {
     const baseRow = Number(baseButton.dataset.row);
     const baseCol = Number(baseButton.dataset.col);
     const adjustedBase = adjustPatternBase(patternType, baseRow, baseCol);
-
-    const insideBoard = isPatternInsideBoard(offsets, adjustedBase);
-    const previewClass = insideBoard ? "preview" : "preview-invalid";
+    const previewClass = decidePreviewClass(offsets, adjustedBase);
 
     offsets.forEach((offset) => {
         const row = adjustedBase.row + offset[0];
@@ -572,6 +570,29 @@ function updatePatternPreview(baseButton) {
             previewCellButtons.push(button);
         }
     });
+}
+
+/**
+ * パターンプレビューに使うCSSクラスを決めます。
+ *
+ * 盤面外にはみ出す場合は赤色用のpreview-invalid、
+ * 既存の生きているセルと重なる場合は黄色用のpreview-overlap、
+ * それ以外の場合は青色用のpreviewを返します。
+ *
+ * @param {number[][]} offsets パターンの相対座標
+ * @param {{row: number, col: number}} adjustedBase 調整後の基準位置
+ * @return {string} プレビューに使うCSSクラス名
+ */
+function decidePreviewClass(offsets, adjustedBase) {
+    if (!isPatternInsideBoard(offsets, adjustedBase)) {
+        return "preview-invalid";
+    }
+
+    if (overlapsAliveCell(offsets, adjustedBase)) {
+        return "preview-overlap";
+    }
+
+    return "preview";
 }
 
 /**
@@ -636,6 +657,7 @@ function adjustPatternBase(patternType, baseRow, baseCol) {
 function clearPatternPreview() {
     previewCellButtons.forEach((button) => {
         button.classList.remove("preview");
+        button.classList.remove("preview-overlap");
         button.classList.remove("preview-invalid");
     });
 
@@ -663,4 +685,23 @@ function canPlacePatternAt(baseButton) {
     const adjustedBase = adjustPatternBase(patternType, baseRow, baseCol);
 
     return isPatternInsideBoard(offsets, adjustedBase);
+}
+
+/**
+ * 指定されたパターンが、既存の生きているセルと重なるかどうかを判定します。
+ *
+ * 盤面内にあるプレビュー対象セルの中に、すでにaliveクラスを持つセルがあればtrueを返します。
+ *
+ * @param {number[][]} offsets パターンの相対座標
+ * @param {{row: number, col: number}} adjustedBase 調整後の基準位置
+ * @return {boolean} 既存の生きているセルと重なる場合はtrue
+ */
+function overlapsAliveCell(offsets, adjustedBase) {
+    return offsets.some((offset) => {
+        const row = adjustedBase.row + offset[0];
+        const col = adjustedBase.col + offset[1];
+        const button = findCellButton(row, col);
+
+        return button !== null && button.classList.contains("alive");
+    });
 }

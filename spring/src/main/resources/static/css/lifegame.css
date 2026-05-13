@@ -154,6 +154,13 @@ select:disabled {
     background-color: rgba(0, 120, 255, 0.35);
 }
 
+/* 既存の生きているセルと重なるパターンプレビュー中のセルです */
+.cell.preview-overlap {
+    outline: 2px solid rgba(230, 160, 0, 0.9);
+    outline-offset: -2px;
+    background-color: rgba(230, 160, 0, 0.35);
+}
+
 /* 盤面外にはみ出す配置のプレビュー中のセルです */
 .cell.preview-invalid {
     outline: 2px solid rgba(220, 0, 0, 0.9);
