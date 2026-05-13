@@ -43,8 +43,6 @@ Swing版で作成したライフゲームの考え方をもとに、Web画面、
 
 ### Spring Boot版
 
-### Spring Boot版
-
 - ブラウザ上でのライフゲーム盤面表示
 - 盤面操作モード選択（Edit Cell / Place Pattern）
 - 描画モード選択（Toggle / Draw / Erase）
@@ -154,7 +152,8 @@ spring
 │  ├─ controller
 │  │  ├─ LifeGamePageController.java    // ライフゲーム画面の表示を担当
 │  │  ├─ LifeGameApiController.java     // JavaScriptから呼び出されるAPIを担当
-│  │  └─ request                        // JSONリクエストを受け取るrecord群
+│  │  ├─ request                        // JSONリクエストを受け取るrecord群
+│  │  └─ response                       // JSONレスポンスを返すrecord群
 │  ├─ model
 │  │  ├─ LifeGameBoard.java             // 盤面状態とライフゲームのルールを管理
 │  │  ├─ PatternType.java               // 配置できるパターンの種類を定義
@@ -455,9 +454,9 @@ sequenceDiagram
 
 - 盤面サイズ変更機能
 - セッションごとの盤面管理
-- APIリクエスト用recordとModel側の値オブジェクトの整理
 - JavaScriptのさらなる責務分離
 - レスポンシブ表示の改善
+- 公開前のCPU・メモリ負荷対策
 
 ---
 

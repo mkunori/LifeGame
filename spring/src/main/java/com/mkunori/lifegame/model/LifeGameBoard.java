@@ -184,7 +184,7 @@ public class LifeGameBoard {
     public void randomize() {
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                cells[row][col] = Math.random() < 0.3;
+                cells[row][col] = random.nextDouble() < 0.3;
             }
         }
 
