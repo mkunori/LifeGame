@@ -10,12 +10,41 @@ h1 {
     margin-bottom: 12px;
 }
 
-/* 操作用ボタンを置く領域です */
-.controls {
+/* 操作用の領域全体です */
+.control-panel {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 16px;
     margin-bottom: 16px;
+}
+
+/* 操作グループです */
+.control-group {
+    min-width: 260px;
+    padding: 12px;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+}
+
+/* 操作グループの見出しです */
+.control-group h2 {
+    margin: 0 0 8px;
+    font-size: 16px;
+}
+
+/* 操作部品を横並びにする行です */
+.control-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+/* 最後の行だけ下余白をなくします */
+.control-row:last-child {
+    margin-bottom: 0;
 }
 
 /* Step、Clear、Randomなどの操作ボタンの見た目です */
@@ -25,16 +54,8 @@ h1 {
     cursor: pointer;
 }
 
-/* 自動再生の速度調整を置く領域です */
-.speed-controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
 /* 速度スライダーの横幅です */
-.speed-controls input[type="range"] {
+#speedSlider {
     width: 240px;
 }
 
@@ -44,27 +65,22 @@ h1 {
     font-weight: bold;
 }
 
-/* セル編集モード選択を置く領域です */
-.edit-mode-controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
-/* パターン配置の操作部品を横並びにします */
-.pattern-controls {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
 /* パターン選択や編集モード選択用のセレクトボックスです */
 select {
     padding: 8px;
     font-size: 16px;
+}
+
+/* 無効化されたセレクトボックスは少し薄く表示します */
+select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 操作補足の短い説明文です */
+.help-text {
+    font-size: 14px;
+    color: #666666;
 }
 
 /* 盤面の状態表示をまとめる領域です */
@@ -125,26 +141,6 @@ select {
 .board-wrapper {
     max-width: 100%;
     overflow-x: auto;
-}
-
-/* 盤面操作モード選択を置く領域です */
-.action-mode-controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
-/* 無効化されたセレクトボックスは少し薄く表示します */
-select:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* 操作補足の短い説明文です */
-.help-text {
-    font-size: 14px;
-    color: #666666;
 }
 
 /* 配置可能なパターンプレビュー中のセルです */

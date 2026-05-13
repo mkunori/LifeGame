@@ -15,115 +15,92 @@
     <!-- 画面の見出しです -->
     <h1>LifeGame Spring</h1>
 
-    <!-- 操作用のボタンをまとめる領域です -->
-    <div class="controls">
-        <!--
-            Stepボタンです。
-            JavaScriptでAPIを呼び出し、画面を再読み込みせずに1世代進めます。
-        -->
-        <button type="button" id="stepButton" class="control-button">Step</button>
+    <!-- 操作用の領域全体です -->
+    <div class="control-panel">
 
-        <!--
-            Startボタンです。
-            JavaScriptで自動再生を開始します。
-        -->
-        <button type="button" id="startButton" class="control-button">Start</button>
+        <!-- シミュレーション操作のグループです -->
+        <section class="control-group">
+            <h2>Simulation</h2>
 
-        <!--
-            Stopボタンです。
-            JavaScriptで自動再生を停止します。
-        -->
-        <button type="button" id="stopButton" class="control-button">Stop</button>
+            <div class="control-row">
+                <!-- Stepボタンです。1世代だけ進めます。 -->
+                <button type="button" id="stepButton" class="control-button">Step</button>
 
-        <!--
-            Clearボタンです。
-            JavaScriptでAPIを呼び出し、画面を再読み込みせずに盤面をクリアします。
-        -->
-        <button type="button" id="clearButton" class="control-button">Clear</button>
+                <!-- Startボタンです。自動再生を開始します。 -->
+                <button type="button" id="startButton" class="control-button">Start</button>
 
-        <!--
-            Resetボタンです。
-            JavaScriptでAPIを呼び出し、画面を再読み込みせずに初期状態へ戻します。
-        -->
-        <button type="button" id="resetButton" class="control-button">Reset</button>
+                <!-- Stopボタンです。自動再生を停止します。 -->
+                <button type="button" id="stopButton" class="control-button">Stop</button>
+            </div>
 
-        <!--
-            Randomボタンです。
-            JavaScriptでAPIを呼び出し、画面を再読み込みせずにランダム配置します。
-        -->
-        <button type="button" id="randomButton" class="control-button">Random</button>
-    </div>
+            <!-- 自動再生の速度を調整する領域です -->
+            <div class="control-row">
+                <label for="speedSlider">Speed:</label>
 
-    <!-- 自動再生の速度を調整する領域です -->
-    <div class="speed-controls">
-        <!-- スライダーの説明ラベルです -->
-        <label for="speedSlider">Speed:</label>
+                <input type="range" id="speedSlider" min="50" max="1000" step="50" value="300">
 
-        <!--
-            自動再生の間隔をミリ秒で指定するスライダーです。
-            値が小さいほど速く、大きいほど遅くなります。
-        -->
-        <input type="range" id="speedSlider" min="50" max="1000" step="50" value="300">
+                <span id="speedValue">300 ms</span>
+            </div>
+        </section>
 
-        <!-- 現在の速度設定を表示します -->
-        <span id="speedValue">300 ms</span>
-    </div>
+        <!-- 盤面操作のグループです -->
+        <section class="control-group">
+            <h2>Board</h2>
 
-    <!-- 盤面操作モードを選択する領域です -->
-    <div class="action-mode-controls">
-        <!-- 盤面操作モード選択用のラベルです -->
-        <label for="actionMode">Action Mode:</label>
+            <div class="control-row">
+                <!-- Clearボタンです。盤面をすべてクリアします。 -->
+                <button type="button" id="clearButton" class="control-button">Clear</button>
 
-        <!--
-            盤面操作モードを選ぶセレクトボックスです。
-            actionModesはControllerから渡されたActionMode.values()です。
-        -->
-        <select id="actionMode" name="actionMode">
-            <!--
-                actionModesから1つずつmodeを取り出します。
-                valueにはenum名、表示にはdisplayNameを使います。
-            -->
-            <option th:each="mode : ${actionModes}" th:value="${mode.name()}" th:text="${mode.displayName}">
-                Action Mode
-            </option>
-        </select>
-    </div>
+                <!-- Resetボタンです。初期状態に戻します。 -->
+                <button type="button" id="resetButton" class="control-button">Reset</button>
 
-    <!-- セル編集モードを選択する領域です -->
-    <div class="edit-mode-controls">
-        <label for="cellEditMode">Edit Mode:</label>
+                <!-- Randomボタンです。ランダム配置します。 -->
+                <button type="button" id="randomButton" class="control-button">Random</button>
+            </div>
+        </section>
 
-        <select id="cellEditMode" name="cellEditMode">
-            <option th:each="mode : ${cellEditModes}" th:value="${mode.name()}" th:text="${mode.displayName}">
-                Edit Mode
-            </option>
-        </select>
+        <!-- 編集操作のグループです -->
+        <section class="control-group">
+            <h2>Edit</h2>
 
-        <!-- Place PatternモードではEdit Modeを使わないことを示す説明です -->
-        <span id="editModeHelp" class="help-text"></span>
-    </div>
+            <!-- 盤面操作モードを選択する領域です -->
+            <div class="control-row">
+                <label for="actionMode">Action Mode:</label>
 
-    <!-- パターン配置用の操作領域です -->
-    <div class="pattern-controls">
-        <!-- パターン選択用のラベルです -->
-        <label for="patternType">Pattern:</label>
+                <select id="actionMode" name="actionMode">
+                    <option th:each="mode : ${actionModes}" th:value="${mode.name()}" th:text="${mode.displayName}">
+                        Action Mode
+                    </option>
+                </select>
+            </div>
 
-        <!--
-            パターンを選ぶセレクトボックスです。
-            Place Patternモードのときだけ使用します。
-        -->
-        <select id="patternType" name="patternType">
-            <!--
-                patternTypesから1つずつpatternを取り出します。
-                valueにはenum名、表示にはdisplayNameを使います。
-            -->
-            <option th:each="pattern : ${patternTypes}" th:value="${pattern.name()}" th:text="${pattern.displayName}">
-                Pattern
-            </option>
-        </select>
+            <!-- セル編集モードを選択する領域です -->
+            <div class="control-row">
+                <label for="cellEditMode">Edit Mode:</label>
 
-        <!-- Place Patternモード以外ではPatternを使わないことを示す説明です -->
-        <span id="patternHelp" class="help-text"></span>
+                <select id="cellEditMode" name="cellEditMode">
+                    <option th:each="mode : ${cellEditModes}" th:value="${mode.name()}" th:text="${mode.displayName}">
+                        Edit Mode
+                    </option>
+                </select>
+
+                <span id="editModeHelp" class="help-text"></span>
+            </div>
+
+            <!-- パターン配置用の操作領域です -->
+            <div class="control-row">
+                <label for="patternType">Pattern:</label>
+
+                <select id="patternType" name="patternType">
+                    <option th:each="pattern : ${patternTypes}" th:value="${pattern.name()}"
+                        th:text="${pattern.displayName}">
+                        Pattern
+                    </option>
+                </select>
+
+                <span id="patternHelp" class="help-text"></span>
+            </div>
+        </section>
     </div>
 
     <!-- 盤面の状態を表示する領域です -->
