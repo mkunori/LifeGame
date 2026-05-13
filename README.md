@@ -50,9 +50,16 @@ Swing版で作成したライフゲームの考え方をもとに、Web画面、
 
 ### Spring Boot版
 
+### Spring Boot版
+
 - ブラウザ上でのライフゲーム盤面表示
 - 盤面操作モード選択（Edit Cell / Place Pattern）
 - 描画モード選択（Toggle / Draw / Erase）
+- パターン配置時のプレビュー表示
+  - 配置可能な場合は青色表示
+  - 既存セルと重なる場合は黄色表示
+  - 盤面外にはみ出す場合は赤色表示
+- Simulation / Board / Edit に分けた操作UI
 
 ## ■ 操作方法
 
@@ -84,19 +91,47 @@ Swing版で作成したライフゲームの考え方をもとに、Web画面、
 
 ### Spring Boot版
 
-- Action Mode プルダウン  
+操作UIは、以下の3つのグループに分けています。
+
+#### Simulation
+
+- Step  
+  盤面を1世代だけ進めます
+- Start  
+  自動更新を開始します
+- Stop  
+  自動更新を停止します
+- Speed  
+  自動更新の間隔を変更します
+
+#### Board
+
+- Clear  
+  盤面をすべてクリアします
+- Reset  
+  初期状態のパターンに戻します
+- Random  
+  盤面をランダムな状態にします
+
+#### Edit
+
+- Action Mode  
   盤面クリック時の大きな動作を切り替えます
   - Edit Cell
   - Place Pattern
-- Edit Mode プルダウン  
+- Edit Mode  
   Edit Cellモード時のセル編集方法を切り替えます
   - Toggle
   - Draw
   - Erase
+- Pattern  
+  Place Patternモード時に配置するパターンを選択します
 - ドラッグ（Edit Cellモード）  
   選択中のEdit Modeに応じて、通過したセルをまとめて編集します
-- Action Mode: Place Pattern  
-  Patternプルダウンで選択したパターンを、クリックした位置に配置します
+- 盤面クリック（Place Patternモード）  
+  選択したパターンをクリック位置に配置します
+- パターン配置プレビュー  
+  配置可能な場合は青、既存セルと重なる場合は黄、盤面外にはみ出す場合は赤で表示します
 
 ## ■ パッケージ構成
 
@@ -216,6 +251,7 @@ classDiagram
     class LifeGameBoard
     class PatternType
     class CellEditMode
+    class CellPosition
     class ActionMode
     class RequestRecords
     class lifegame_html
@@ -236,6 +272,10 @@ classDiagram
 
     LifeGameBoard --> PatternType : places pattern
     LifeGameBoard --> CellEditMode : edits cells
+
+    RequestRecords --> CellPosition : uses
+
+    LifeGameService --> CellPosition : receives cells
 
     lifegame_html --> lifegame_css : uses
     lifegame_html --> lifegameApi_js : loads
@@ -360,7 +400,7 @@ sequenceDiagram
     JS->>Browser: セル表示とGenerationを更新
 ```
 
-#### セルToggle API
+#### セル編集API（クリック / ドラッグ）
 
 ```mermaid
 sequenceDiagram
@@ -420,12 +460,12 @@ sequenceDiagram
 
 ### Spring Boot版
 
-- パターン配置時のプレビュー表示
-- パターン配置時のはみ出し表示や配置可否の見える化
 - 盤面サイズ変更機能
 - セッションごとの盤面管理
 - APIリクエスト用recordとModel側の値オブジェクトの整理
+- パターン定義をJavaScriptとJavaで二重管理しない構成への改善
 - JavaScriptのさらなる責務分離
+- レスポンシブ表示の改善
 
 ---
 
@@ -454,3 +494,5 @@ sequenceDiagram
   - API呼び出し
   - 画面更新
   - イベント制御
+- JavaScriptによるパターン配置プレビューの実装
+- UIを Simulation / Board / Edit に分ける画面整理
