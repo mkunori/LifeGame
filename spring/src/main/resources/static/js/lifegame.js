@@ -462,6 +462,7 @@ function updateControlsForActionMode() {
     } else {
         editModeHelp.textContent = "";
         patternHelp.textContent = "Place Patternのときだけ使用します";
+        clearPatternPreview();
     }
 }
 
@@ -492,9 +493,15 @@ async function editCellsByApi(cells) {
 /**
  * 指定されたセル位置を基準に、選択中のパターンを配置します。
  *
+ * パターンが盤面外にはみ出す場合は配置しません。
+ *
  * @param {HTMLButtonElement} button 配置位置として使うセルボタン
  */
 async function placePatternAtCellByApi(button) {
+    if (!canPlacePatternAt(button)) {
+        return;
+    }
+
     const patternType = patternTypeSelect.value;
     const row = Number(button.dataset.row);
     const col = Number(button.dataset.col);
@@ -529,7 +536,7 @@ function applyBoardIfAvailable(board) {
  * 指定されたセルを基準に、選択中パターンのプレビューを表示します。
  *
  * Place Patternモードでない場合は、プレビューを消して何もしません。
- * 未定義のパターンが選ばれている場合も、何もしません。
+ * パターンが盤面内に収まる場合は青色、はみ出す場合は赤色で表示します。
  *
  * @param {HTMLButtonElement} baseButton 基準にするセルボタン
  */
@@ -544,6 +551,7 @@ function updatePatternPreview(baseButton) {
     const offsets = patternOffsets[patternType];
 
     if (offsets === undefined) {
+        console.warn("Unknown pattern type:", patternType);
         return;
     }
 
@@ -551,27 +559,37 @@ function updatePatternPreview(baseButton) {
     const baseCol = Number(baseButton.dataset.col);
     const adjustedBase = adjustPatternBase(patternType, baseRow, baseCol);
 
+    const insideBoard = isPatternInsideBoard(offsets, adjustedBase);
+    const previewClass = insideBoard ? "preview" : "preview-invalid";
+
     offsets.forEach((offset) => {
         const row = adjustedBase.row + offset[0];
         const col = adjustedBase.col + offset[1];
         const button = findCellButton(row, col);
 
         if (button !== null) {
-            button.classList.add("preview");
+            button.classList.add(previewClass);
             previewCellButtons.push(button);
         }
     });
 }
 
 /**
- * 現在表示しているパターンプレビューを消します。
+ * 指定されたパターンが盤面内にすべて収まるかどうかを判定します。
+ *
+ * パターンのセルが1つでも盤面外になる場合はfalseを返します。
+ *
+ * @param {number[][]} offsets パターンの相対座標
+ * @param {{row: number, col: number}} adjustedBase 調整後の基準位置
+ * @return {boolean} すべて盤面内に収まる場合はtrue
  */
-function clearPatternPreview() {
-    previewCellButtons.forEach((button) => {
-        button.classList.remove("preview");
-    });
+function isPatternInsideBoard(offsets, adjustedBase) {
+    return offsets.every((offset) => {
+        const row = adjustedBase.row + offset[0];
+        const col = adjustedBase.col + offset[1];
 
-    previewCellButtons = [];
+        return findCellButton(row, col) !== null;
+    });
 }
 
 /**
@@ -610,4 +628,39 @@ function adjustPatternBase(patternType, baseRow, baseCol) {
         row: baseRow,
         col: baseCol
     };
+}
+
+/**
+ * 現在表示しているパターンプレビューを消します。
+ */
+function clearPatternPreview() {
+    previewCellButtons.forEach((button) => {
+        button.classList.remove("preview");
+        button.classList.remove("preview-invalid");
+    });
+
+    previewCellButtons = [];
+}
+
+/**
+ * 指定されたセル位置を基準に、選択中パターンを配置できるか判定します。
+ *
+ * パターンが盤面からはみ出す場合はfalseを返します。
+ *
+ * @param {HTMLButtonElement} baseButton 基準にするセルボタン
+ * @return {boolean} 配置できる場合はtrue
+ */
+function canPlacePatternAt(baseButton) {
+    const patternType = patternTypeSelect.value;
+    const offsets = patternOffsets[patternType];
+
+    if (offsets === undefined) {
+        return false;
+    }
+
+    const baseRow = Number(baseButton.dataset.row);
+    const baseCol = Number(baseButton.dataset.col);
+    const adjustedBase = adjustPatternBase(patternType, baseRow, baseCol);
+
+    return isPatternInsideBoard(offsets, adjustedBase);
 }
