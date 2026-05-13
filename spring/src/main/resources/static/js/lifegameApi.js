@@ -104,3 +104,28 @@ async function resetBoardApi() {
 async function randomizeBoardApi() {
     return await postBoardApi("/lifegame/api/random");
 }
+
+/**
+ * Java側で管理しているパターン定義を取得します。
+ *
+ * パターンプレビューで使うために、PatternTypeの相対座標や補正値を取得します。
+ *
+ * @return {Promise<object[]|null>} パターン定義一覧。失敗した場合はnull
+ */
+async function getPatternDefinitionsApi() {
+    try {
+        const response = await fetch("/lifegame/api/pattern-definitions", {
+            method: "GET"
+        });
+
+        if (!response.ok) {
+            console.error("Failed to get pattern definitions:", response.status);
+            return null;
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error while getting pattern definitions:", error);
+        return null;
+    }
+}

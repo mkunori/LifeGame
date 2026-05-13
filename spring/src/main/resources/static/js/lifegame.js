@@ -25,88 +25,9 @@ let draggedCells = [];
 // プレビューを消すときに使います。
 let previewCellButtons = [];
 
-// ==================================================
-// プレビュー用パターン定義
-// ==================================================
-
-// パターン配置プレビューで使う相対座標です。
-// Java側のPatternType / LifeGameBoardにある配置座標と対応させています。
-const patternOffsets = {
-    BLINKER: [
-        [0, -1],
-        [0, 0],
-        [0, 1]
-    ],
-    BLOCK: [
-        [0, 0],
-        [0, 1],
-        [1, 0],
-        [1, 1]
-    ],
-    GLIDER: [
-        [0, 1],
-        [1, 2],
-        [2, 0],
-        [2, 1],
-        [2, 2]
-    ],
-    TOAD: [
-        [0, 1],
-        [0, 2],
-        [0, 3],
-        [1, 0],
-        [1, 1],
-        [1, 2]
-    ],
-    BEACON: [
-        [0, 0],
-        [0, 1],
-        [1, 0],
-        [1, 1],
-        [2, 2],
-        [2, 3],
-        [3, 2],
-        [3, 3]
-    ],
-    GOSPER_GLIDER_GUN: [
-        [0, 24],
-        [1, 22],
-        [1, 24],
-        [2, 12],
-        [2, 13],
-        [2, 20],
-        [2, 21],
-        [2, 34],
-        [2, 35],
-        [3, 11],
-        [3, 15],
-        [3, 20],
-        [3, 21],
-        [3, 34],
-        [3, 35],
-        [4, 0],
-        [4, 1],
-        [4, 10],
-        [4, 16],
-        [4, 20],
-        [4, 21],
-        [5, 0],
-        [5, 1],
-        [5, 10],
-        [5, 14],
-        [5, 16],
-        [5, 17],
-        [5, 22],
-        [5, 24],
-        [6, 10],
-        [6, 16],
-        [6, 24],
-        [7, 11],
-        [7, 15],
-        [8, 12],
-        [8, 13]
-    ]
-};
+// Java側から取得したパターン定義を保存します。
+// keyはPatternTypeのenum名、valueはパターン定義です。
+let patternDefinitions = {};
 
 // ==================================================
 // HTML要素の取得
@@ -242,9 +163,37 @@ boardElement.addEventListener("mouseleave", () => {
 // 初期化
 // ==================================================
 
-// 初期表示時にも、Action Modeに合わせてUI状態を整えます。
-updateControlsForActionMode();
+// 初期表示時に必要なデータ取得とUI状態の整理を行います。
+initialize();
 
+/**
+ * 初期表示時の準備を行います。
+ *
+ * Java側からパターン定義を取得し、
+ * Action Modeに合わせてUI状態を整えます。
+ */
+async function initialize() {
+    await loadPatternDefinitions();
+    updateControlsForActionMode();
+}
+
+/**
+ * Java側からパターン定義を取得して、JavaScript側で使いやすい形に変換します。
+ */
+async function loadPatternDefinitions() {
+    const definitions = await getPatternDefinitionsApi();
+
+    if (definitions === null) {
+        console.error("Pattern definitions could not be loaded.");
+        return;
+    }
+
+    patternDefinitions = {};
+
+    definitions.forEach((definition) => {
+        patternDefinitions[definition.patternType] = definition;
+    });
+}
 
 // ==================================================
 // 自動再生関連
@@ -548,19 +497,19 @@ function updatePatternPreview(baseButton) {
     }
 
     const patternType = patternTypeSelect.value;
-    const offsets = patternOffsets[patternType];
+    const patternDefinition = patternDefinitions[patternType];
 
-    if (offsets === undefined) {
+    if (patternDefinition === undefined) {
         console.warn("Unknown pattern type:", patternType);
         return;
     }
 
     const baseRow = Number(baseButton.dataset.row);
     const baseCol = Number(baseButton.dataset.col);
-    const adjustedBase = adjustPatternBase(patternType, baseRow, baseCol);
-    const previewClass = decidePreviewClass(offsets, adjustedBase);
+    const adjustedBase = adjustPatternBase(patternDefinition, baseRow, baseCol);
+    const previewClass = decidePreviewClass(patternDefinition.offsets, adjustedBase);
 
-    offsets.forEach((offset) => {
+    patternDefinition.offsets.forEach((offset) => {
         const row = adjustedBase.row + offset[0];
         const col = adjustedBase.col + offset[1];
         const button = findCellButton(row, col);
@@ -627,27 +576,17 @@ function findCellButton(row, col) {
 }
 
 /**
- * パターンごとに、プレビュー表示で使う基準位置を調整します。
+ * パターン定義に従って、プレビュー表示や配置判定で使う基準位置を調整します。
  *
- * Gosper Glider Gunは横長のため、Java側の配置処理と同じように
- * 基準位置を少し左上へずらしています。
- *
- * @param {string} patternType パターン種別
+ * @param {object} patternDefinition パターン定義
  * @param {number} baseRow 元の基準行
  * @param {number} baseCol 元の基準列
  * @return {{row: number, col: number}} 調整後の基準位置
  */
-function adjustPatternBase(patternType, baseRow, baseCol) {
-    if (patternType === "GOSPER_GLIDER_GUN") {
-        return {
-            row: baseRow - 4,
-            col: baseCol - 18
-        };
-    }
-
+function adjustPatternBase(patternDefinition, baseRow, baseCol) {
     return {
-        row: baseRow,
-        col: baseCol
+        row: baseRow + patternDefinition.rowAdjustment,
+        col: baseCol + patternDefinition.colAdjustment
     };
 }
 
@@ -674,17 +613,17 @@ function clearPatternPreview() {
  */
 function canPlacePatternAt(baseButton) {
     const patternType = patternTypeSelect.value;
-    const offsets = patternOffsets[patternType];
+    const patternDefinition = patternDefinitions[patternType];
 
-    if (offsets === undefined) {
+    if (patternDefinition === undefined) {
         return false;
     }
 
     const baseRow = Number(baseButton.dataset.row);
     const baseCol = Number(baseButton.dataset.col);
-    const adjustedBase = adjustPatternBase(patternType, baseRow, baseCol);
+    const adjustedBase = adjustPatternBase(patternDefinition, baseRow, baseCol);
 
-    return isPatternInsideBoard(offsets, adjustedBase);
+    return isPatternInsideBoard(patternDefinition.offsets, adjustedBase);
 }
 
 /**

@@ -1,6 +1,5 @@
 package com.mkunori.lifegame.service;
 
-import com.mkunori.lifegame.controller.request.CellPositionRequest;
 import com.mkunori.lifegame.model.CellEditMode;
 import com.mkunori.lifegame.model.CellPosition;
 import com.mkunori.lifegame.model.LifeGameBoard;

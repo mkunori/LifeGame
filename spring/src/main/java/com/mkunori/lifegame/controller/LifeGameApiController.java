@@ -2,8 +2,15 @@ package com.mkunori.lifegame.controller;
 
 import com.mkunori.lifegame.controller.request.EditCellsRequest;
 import com.mkunori.lifegame.controller.request.PlacePatternRequest;
+import com.mkunori.lifegame.controller.response.PatternDefinitionResponse;
 import com.mkunori.lifegame.model.LifeGameBoard;
+import com.mkunori.lifegame.model.PatternType;
 import com.mkunori.lifegame.service.LifeGameService;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -104,5 +111,20 @@ public class LifeGameApiController {
     public LifeGameBoard placePattern(@RequestBody PlacePatternRequest request) {
         lifeGameService.placePattern(request.patternType(), request.row(), request.col());
         return lifeGameService.getBoard();
+    }
+
+    /**
+     * パターン定義の一覧を返します。
+     *
+     * JavaScript側のパターンプレビューで使うために、
+     * Java側で管理しているPatternTypeの定義をJSON形式で返します。
+     *
+     * @return パターン定義の一覧
+     */
+    @GetMapping("/lifegame/api/pattern-definitions")
+    public List<PatternDefinitionResponse> getPatternDefinitions() {
+        return Arrays.stream(PatternType.values())
+                .map(PatternDefinitionResponse::from)
+                .toList();
     }
 }
