@@ -129,3 +129,17 @@ async function getPatternDefinitionsApi() {
         return null;
     }
 }
+
+/**
+ * 盤面サイズを変更します。
+ *
+ * @param {number} rows 新しい行数
+ * @param {number} cols 新しい列数
+ * @return {Promise<object|null>} 更新後の盤面データ
+ */
+async function resizeBoardApi(rows, cols) {
+    return await postBoardApi("/lifegame/api/resize", {
+        rows: rows,
+        cols: cols
+    });
+}

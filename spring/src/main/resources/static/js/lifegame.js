@@ -533,20 +533,6 @@ function applyBoardIfAvailable(board) {
 }
 
 /**
- * 盤面サイズを変更します。
- *
- * @param {number} rows 新しい行数
- * @param {number} cols 新しい列数
- * @return {Promise<object|null>} 更新後の盤面データ
- */
-async function resizeBoardApi(rows, cols) {
-    return await postBoardApi("/lifegame/api/resize", {
-        rows: rows,
-        cols: cols
-    });
-}
-
-/**
  * 自動再生を停止して、盤面サイズを変更します。
  *
  * サイズ変更時は新しい空の盤面を作成し、
@@ -561,6 +547,8 @@ async function resizeBoardByApi() {
     const board = await resizeBoardApi(rows, cols);
 
     if (board === null) {
+        rowInput.value = rowValue.textContent;
+        colInput.value = colValue.textContent;
         return;
     }
 

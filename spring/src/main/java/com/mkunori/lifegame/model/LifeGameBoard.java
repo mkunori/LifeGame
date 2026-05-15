@@ -14,7 +14,7 @@ public class LifeGameBoard {
     private int cols;
     private boolean[][] cells;
     private int generation;
-    private Random random = new Random();
+    private final Random random = new Random();
 
     /**
      * 盤面の最小行数です。
@@ -199,7 +199,7 @@ public class LifeGameBoard {
     /**
      * 盤面上のセルをランダムに生きた状態または死んだ状態にします。
      *
-     * 現在は、およそ4分の1の確率でセルが生きるようにしています。
+     * 現在は、およそ30%の確率でセルが生きるようにしています。
      * ランダム配置は新しい初期状態として扱うため、世代数を0に戻します。
      */
     public void randomize() {

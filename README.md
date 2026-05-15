@@ -51,6 +51,10 @@ Swing版で作成したライフゲームの考え方をもとに、Web画面、
   - 既存セルと重なる場合は黄色表示
   - 盤面外にはみ出す場合は赤色表示
 - Simulation / Board / Edit に分けた操作UI
+- 盤面サイズ変更
+  - Rows: 10〜80
+  - Cols: 10〜120
+  - Resize時は新しい空盤面を作成
 
 ## ■ 操作方法
 
@@ -103,6 +107,11 @@ Swing版で作成したライフゲームの考え方をもとに、Web画面、
   初期状態のパターンに戻します
 - Random  
   盤面をランダムな状態にします
+- Rows / Cols  
+  盤面サイズを指定します。Rows は 10〜80、Cols は 10〜120 の範囲で変更できます。
+- Resize  
+  指定した Rows / Cols のサイズに盤面を変更します。  
+  サイズ変更時は自動再生を停止し、盤面を空にして、Generation を 0 に戻します。
 
 #### Edit
 
@@ -148,30 +157,34 @@ src
 ```text
 spring
 ├─ src/main/java/com/mkunori/lifegame
-│  ├─ LifeGameSpringApplication.java    // Spring Bootアプリケーションのエントリーポイント
+│  ├─ LifeGameSpringApplication.java        // Spring Bootアプリケーションのエントリーポイント
 │  ├─ controller
-│  │  ├─ LifeGamePageController.java    // ライフゲーム画面の表示を担当
-│  │  ├─ LifeGameApiController.java     // JavaScriptから呼び出されるAPIを担当
-│  │  ├─ request                        // JSONリクエストを受け取るrecord群
-│  │  └─ response                       // JSONレスポンスを返すrecord群
+│  │  ├─ LifeGamePageController.java        // ライフゲーム画面の表示を担当
+│  │  ├─ LifeGameApiController.java         // JavaScriptから呼び出されるAPIを担当
+│  │  ├─ request                            // JSONリクエストを受け取るrecord群
+│  │  │  ├─ EditCellsRequest.java           // 複数セル編集APIのリクエスト
+│  │  │  ├─ PlacePatternRequest.java        // パターン配置APIのリクエスト
+│  │  │  └─ ResizeBoardRequest.java         // 盤面サイズ変更APIのリクエスト
+│  │  └─ response                           // JSONレスポンスを返すrecord群
+│  │     └─ PatternDefinitionResponse.java  // Java側のパターン定義をJavaScriptへ返すレスポンス
 │  ├─ model
-│  │  ├─ LifeGameBoard.java             // 盤面状態とライフゲームのルールを管理
-│  │  ├─ PatternType.java               // 配置できるパターンの種類を定義
-│  │  ├─ CellEditMode.java              // Toggle / Draw / Erase を定義
-│  │  ├─ CellPosition.java              // 盤面上の1つのセル位置を表す値オブジェクト
-│  │  └─ ActionMode.java                // Edit Cell / Place Pattern を定義
+│  │  ├─ LifeGameBoard.java                 // 盤面状態、世代、サイズ、ライフゲームのルールを管理
+│  │  ├─ PatternType.java                   // 配置できるパターンの種類・座標・補正値を定義
+│  │  ├─ CellEditMode.java                  // Toggle / Draw / Erase を定義
+│  │  ├─ CellPosition.java                  // 盤面上の1つのセル位置を表す値オブジェクト
+│  │  └─ ActionMode.java                    // Edit Cell / Place Pattern を定義
 │  └─ service
-│     └─ LifeGameService.java           // ControllerとModelの間で処理を仲介
+│     └─ LifeGameService.java               // ControllerとModelの間で処理を仲介
 └─ src/main/resources
    ├─ templates
-   │  └─ lifegame.html                  // 初期画面を表示するThymeleafテンプレート
+   │  └─ lifegame.html                      // 初期画面を表示するThymeleafテンプレート
    └─ static
       ├─ css
-      │  └─ lifegame.css                // 画面デザイン
+      │  └─ lifegame.css                    // 画面デザイン
       └─ js
-         ├─ lifegameApi.js              // Spring Boot API呼び出しを担当
-         ├─ lifegameView.js             // 盤面や世代数の画面更新を担当
-         └─ lifegame.js                 // イベント登録、自動再生、ドラッグ操作などを担当
+         ├─ lifegameApi.js                  // Spring Boot API呼び出しを担当
+         ├─ lifegameView.js                 // 盤面や世代数、盤面HTMLの更新を担当
+         └─ lifegame.js                     // イベント登録、自動再生、ドラッグ操作などを担当
 
 <初期表示>
 ブラウザ
@@ -243,9 +256,12 @@ classDiagram
     class LifeGameBoard
     class PatternType
     class CellEditMode
-    class CellPosition
     class ActionMode
-    class RequestRecords
+    class CellPosition
+    class EditCellsRequest
+    class PlacePatternRequest
+    class ResizeBoardRequest
+    class PatternDefinitionResponse
     class lifegame_html
     class lifegameApi_js
     class lifegameView_js
@@ -256,18 +272,28 @@ classDiagram
     LifeGamePageController --> PatternType : provides pattern options
     LifeGamePageController --> CellEditMode : provides edit modes
     LifeGamePageController --> ActionMode : provides action modes
+    LifeGamePageController --> LifeGameBoard : provides size limits
     LifeGamePageController --> lifegame_html : returns view
 
     LifeGameApiController --> LifeGameService : updates board
-    LifeGameApiController --> RequestRecords : receives JSON
+    LifeGameApiController --> EditCellsRequest : receives JSON
+    LifeGameApiController --> PlacePatternRequest : receives JSON
+    LifeGameApiController --> ResizeBoardRequest : receives JSON
+    LifeGameApiController --> PatternDefinitionResponse : returns JSON
+
     LifeGameService --> LifeGameBoard : delegates
+    LifeGameService --> CellPosition : receives cells
 
     LifeGameBoard --> PatternType : places pattern
     LifeGameBoard --> CellEditMode : edits cells
+    LifeGameBoard --> CellPosition : edits cells
 
-    RequestRecords --> CellPosition : uses
+    PatternDefinitionResponse --> PatternType : converts from
 
-    LifeGameService --> CellPosition : receives cells
+    EditCellsRequest --> CellEditMode : has mode
+    EditCellsRequest --> CellPosition : has cells
+    PlacePatternRequest --> PatternType : has pattern
+    ResizeBoardRequest --> LifeGameBoard : uses size limits
 
     lifegame_html --> lifegame_css : uses
     lifegame_html --> lifegameApi_js : loads
@@ -452,7 +478,6 @@ sequenceDiagram
 
 ### Spring Boot版
 
-- 盤面サイズ変更機能
 - セッションごとの盤面管理
 - JavaScriptのさらなる責務分離
 - レスポンシブ表示の改善
