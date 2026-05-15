@@ -5,6 +5,8 @@ import com.mkunori.lifegame.model.CellPosition;
 import com.mkunori.lifegame.model.LifeGameBoard;
 import com.mkunori.lifegame.model.PatternType;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -23,14 +25,59 @@ import org.springframework.web.context.annotation.SessionScope;
 @SessionScope
 public class LifeGameService {
 
-    private final LifeGameBoard board = new LifeGameBoard(60, 100);
-
     /**
      * 1回のセル編集APIで受け付ける最大セル数です。
      *
      * 極端に大きなリクエストによるCPU・メモリ負荷を避けるために使います。
      */
     private static final int MAX_EDIT_CELLS = 1000;
+
+    /**
+     * StepやEdit Cellsなど、軽いAPIの最短実行間隔です。
+     */
+    private static final Duration SHORT_ACTION_INTERVAL = Duration.ofMillis(50);
+
+    /**
+     * Pattern配置APIの最短実行間隔です。
+     */
+    private static final Duration PATTERN_ACTION_INTERVAL = Duration.ofMillis(100);
+
+    /**
+     * Clear、Reset、Randomなど、盤面全体を変更するAPIの最短実行間隔です。
+     */
+    private static final Duration BOARD_ACTION_INTERVAL = Duration.ofMillis(200);
+
+    /**
+     * Resize APIの最短実行間隔です。
+     */
+    private static final Duration RESIZE_ACTION_INTERVAL = Duration.ofMillis(1000);
+
+    private final LifeGameBoard board = new LifeGameBoard(60, 100);
+
+    /**
+     * 最後にStep APIを実行した時刻です。
+     */
+    private Instant lastStepTime = Instant.EPOCH;
+
+    /**
+     * 最後に複数セル編集APIを実行した時刻です。
+     */
+    private Instant lastEditCellsTime = Instant.EPOCH;
+
+    /**
+     * 最後にパターン配置APIを実行した時刻です。
+     */
+    private Instant lastPlacePatternTime = Instant.EPOCH;
+
+    /**
+     * 最後に盤面全体を変更するAPIを実行した時刻です。
+     */
+    private Instant lastBoardActionTime = Instant.EPOCH;
+
+    /**
+     * 最後にResize APIを実行した時刻です。
+     */
+    private Instant lastResizeTime = Instant.EPOCH;
 
     /**
      * 現在の盤面を返します。
@@ -45,13 +92,19 @@ public class LifeGameService {
      * 盤面を1世代進めます。
      */
     public void nextGeneration() {
+        lastStepTime = validateIntervalAndGetNow(
+                lastStepTime, SHORT_ACTION_INTERVAL, "step");
+
         board.nextGeneration();
     }
 
     /**
-     * 盤面上のすべてのセルを死んだ状態にします。
+     * 盤面をすべてクリアします。
      */
     public void clear() {
+        lastBoardActionTime = validateIntervalAndGetNow(
+                lastBoardActionTime, BOARD_ACTION_INTERVAL, "board-action");
+
         board.clear();
     }
 
@@ -59,13 +112,19 @@ public class LifeGameService {
      * 盤面を初期状態に戻します。
      */
     public void reset() {
+        lastBoardActionTime = validateIntervalAndGetNow(
+                lastBoardActionTime, BOARD_ACTION_INTERVAL, "board-action");
+
         board.reset();
     }
 
     /**
-     * 盤面上のセルをランダムに生きた状態または死んだ状態にします。
+     * 盤面をランダムな状態にします。
      */
     public void randomize() {
+        lastBoardActionTime = validateIntervalAndGetNow(
+                lastBoardActionTime, BOARD_ACTION_INTERVAL, "board-action");
+
         board.randomize();
     }
 
@@ -80,6 +139,9 @@ public class LifeGameService {
      */
     public void editCells(CellEditMode mode, List<CellPosition> cells) {
         validateEditCellsRequest(mode, cells);
+
+        lastEditCellsTime = validateIntervalAndGetNow(
+                lastEditCellsTime, SHORT_ACTION_INTERVAL, "edit-cells");
 
         board.editCells(mode, cells);
     }
@@ -125,6 +187,9 @@ public class LifeGameService {
             throw new IllegalArgumentException("patternType must not be null.");
         }
 
+        lastPlacePatternTime = validateIntervalAndGetNow(
+                lastPlacePatternTime, PATTERN_ACTION_INTERVAL, "place-pattern");
+
         board.placePattern(patternType, row, col);
     }
 
@@ -138,6 +203,28 @@ public class LifeGameService {
      * @param cols 新しい列数
      */
     public void resize(int rows, int cols) {
+        lastResizeTime = validateIntervalAndGetNow(
+                lastResizeTime, RESIZE_ACTION_INTERVAL, "resize");
+
         board.resize(rows, cols);
+    }
+
+    /**
+     * 現在時刻を返しつつ、前回実行時刻から指定された間隔が空いているか確認します。
+     *
+     * @param lastExecutedAt 前回実行時刻
+     * @param interval       必要な最短間隔
+     * @param actionName     操作名
+     * @return 検証に使った現在時刻
+     */
+    private Instant validateIntervalAndGetNow(
+            Instant lastExecutedAt, Duration interval, String actionName) {
+        Instant now = Instant.now();
+
+        if (Duration.between(lastExecutedAt, now).compareTo(interval) < 0) {
+            throw new IllegalArgumentException(actionName + " is requested too frequently.");
+        }
+
+        return now;
     }
 }

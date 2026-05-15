@@ -529,7 +529,29 @@ function applyBoardIfAvailable(board) {
         return;
     }
 
+    if (isBoardSizeChanged(board)) {
+        rebuildBoardView(board, boardElement);
+
+        cellButtons = document.querySelectorAll(".cell");
+        registerCellEvents();
+
+        updateBoardSize(board.rows, board.cols, rowValue, colValue);
+    }
+
     updateBoardView(board, generationValue, cellButtons);
+}
+
+/**
+ * 現在の画面上のセル数と、APIから返された盤面サイズが異なるか判定します。
+ *
+ * 同じセッションの別タブでResizeされた場合などに、
+ * 画面上のセルDOMとサーバー側の盤面サイズがズレることがあります。
+ *
+ * @param {object} board Spring Boot側から返された盤面データ
+ * @return {boolean} 盤面サイズが変わっている場合はtrue
+ */
+function isBoardSizeChanged(board) {
+    return cellButtons.length !== board.rows * board.cols;
 }
 
 /**
