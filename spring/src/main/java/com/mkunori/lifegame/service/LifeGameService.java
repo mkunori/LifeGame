@@ -15,6 +15,9 @@ import org.springframework.web.context.annotation.SessionScope;
  *
  * Controllerから呼び出され、盤面データの取得や更新を行います。
  * 画面から直接Modelを操作させず、Serviceを通して処理する構成にしています。
+ *
+ * このServiceはセッションごとに作成されるため、
+ * ブラウザセッションごとに別々の盤面状態を持ちます。
  */
 @Service
 @SessionScope
@@ -111,21 +114,6 @@ public class LifeGameService {
     }
 
     /**
-     * 指定された1つのセルを、編集モードに応じて編集します。
-     *
-     * @param mode セル編集モード
-     * @param row  行番号
-     * @param col  列番号
-     */
-    private void editCell(CellEditMode mode, int row, int col) {
-        switch (mode) {
-            case TOGGLE -> board.toggleCell(row, col);
-            case DRAW -> board.setCellAlive(row, col);
-            case ERASE -> board.setCellDead(row, col);
-        }
-    }
-
-    /**
      * 指定されたパターンを、指定位置を基準に配置します。
      *
      * @param patternType 配置するパターンの種類
@@ -133,6 +121,10 @@ public class LifeGameService {
      * @param col         基準にする列番号
      */
     public void placePattern(PatternType patternType, int row, int col) {
+        if (patternType == null) {
+            throw new IllegalArgumentException("patternType must not be null.");
+        }
+
         board.placePattern(patternType, row, col);
     }
 

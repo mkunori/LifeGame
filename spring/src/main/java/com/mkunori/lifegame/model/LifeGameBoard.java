@@ -96,6 +96,10 @@ public class LifeGameBoard {
      * @return セルが生きている場合はtrue、死んでいる場合はfalse
      */
     public boolean isAlive(int row, int col) {
+        if (!isInside(row, col)) {
+            return false;
+        }
+
         return cells[row][col];
     }
 

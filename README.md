@@ -474,9 +474,11 @@ sequenceDiagram
 
 ### Spring Boot版
 
-- JavaScriptのさらなる責務分離
+- 公開前のCPU・メモリ負荷対策の強化
 - レスポンシブ表示の改善
-- 公開前のCPU・メモリ負荷対策
+- JavaScriptのさらなる責務分離
+- パターン追加
+- テストコードの充実
 
 ## ■ 学習ポイント
 
