@@ -23,6 +23,13 @@ public class LifeGameService {
     private final LifeGameBoard board = new LifeGameBoard(60, 100);
 
     /**
+     * 1回のセル編集APIで受け付ける最大セル数です。
+     *
+     * 極端に大きなリクエストによるCPU・メモリ負荷を避けるために使います。
+     */
+    private static final int MAX_EDIT_CELLS = 1000;
+
+    /**
      * 現在の盤面を返します。
      *
      * @return 現在のライフゲーム盤面
@@ -62,12 +69,44 @@ public class LifeGameService {
     /**
      * 指定された複数セルを、編集モードに応じてまとめて編集します。
      *
+     * 極端に大きなリクエストや不正なリクエストを避けるため、
+     * 編集モードやセル一覧の内容を確認してからModelへ委譲します。
+     *
      * @param mode  セル編集モード
      * @param cells 編集するセル位置の一覧
      */
     public void editCells(CellEditMode mode, List<CellPosition> cells) {
-        for (CellPosition cell : cells) {
-            editCell(mode, cell.row(), cell.col());
+        validateEditCellsRequest(mode, cells);
+
+        board.editCells(mode, cells);
+    }
+
+    /**
+     * 複数セル編集リクエストの内容を確認します。
+     *
+     * @param mode  セル編集モード
+     * @param cells 編集するセル位置の一覧
+     */
+    private void validateEditCellsRequest(CellEditMode mode, List<CellPosition> cells) {
+        if (mode == null) {
+            throw new IllegalArgumentException("mode must not be null.");
+        }
+
+        if (cells == null) {
+            throw new IllegalArgumentException("cells must not be null.");
+        }
+
+        if (cells.isEmpty()) {
+            throw new IllegalArgumentException("cells must not be empty.");
+        }
+
+        if (cells.size() > MAX_EDIT_CELLS) {
+            throw new IllegalArgumentException(
+                    "cells must not contain more than " + MAX_EDIT_CELLS + " items.");
+        }
+
+        if (cells.stream().anyMatch(cell -> cell == null)) {
+            throw new IllegalArgumentException("cells must not contain null.");
         }
     }
 

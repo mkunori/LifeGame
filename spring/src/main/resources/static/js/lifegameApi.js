@@ -28,7 +28,8 @@ async function postBoardApi(url, requestBody = null) {
         const response = await fetch(url, options);
 
         if (!response.ok) {
-            console.error("Failed to update LifeGame:", response.status);
+            const errorMessage = await readErrorMessage(response);
+            console.error("Failed to update LifeGame:", response.status, errorMessage);
             return null;
         }
 
@@ -119,7 +120,8 @@ async function getPatternDefinitionsApi() {
         });
 
         if (!response.ok) {
-            console.error("Failed to get pattern definitions:", response.status);
+            const errorMessage = await readErrorMessage(response);
+            console.error("Failed to get pattern definitions:", response.status, errorMessage);
             return null;
         }
 
@@ -142,4 +144,27 @@ async function resizeBoardApi(rows, cols) {
         rows: rows,
         cols: cols
     });
+}
+
+/**
+ * APIエラーレスポンスからメッセージを読み取ります。
+ *
+ * サーバー側がJSONでmessageを返している場合はその内容を使い、
+ * 読み取れない場合は汎用的なメッセージを返します。
+ *
+ * @param {Response} response fetch APIのレスポンス
+ * @return {Promise<string>} エラーメッセージ
+ */
+async function readErrorMessage(response) {
+    try {
+        const body = await response.json();
+
+        if (body.message !== undefined) {
+            return body.message;
+        }
+    } catch (error) {
+        console.error("Failed to read error response:", error);
+    }
+
+    return "API request failed.";
 }

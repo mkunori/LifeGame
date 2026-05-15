@@ -1,5 +1,6 @@
 package com.mkunori.lifegame.model;
 
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -145,6 +146,33 @@ public class LifeGameBoard {
         }
 
         cells[row][col] = false;
+    }
+
+    /**
+     * 指定された複数セルを、編集モードに応じてまとめて編集します。
+     *
+     * @param mode  セル編集モード
+     * @param cells 編集するセル位置の一覧
+     */
+    public void editCells(CellEditMode mode, List<CellPosition> cells) {
+        for (CellPosition cell : cells) {
+            editCell(mode, cell.row(), cell.col());
+        }
+    }
+
+    /**
+     * 指定された1つのセルを、編集モードに応じて編集します。
+     *
+     * @param mode セル編集モード
+     * @param row  行番号
+     * @param col  列番号
+     */
+    private void editCell(CellEditMode mode, int row, int col) {
+        switch (mode) {
+            case TOGGLE -> toggleCell(row, col);
+            case DRAW -> setCellAlive(row, col);
+            case ERASE -> setCellDead(row, col);
+        }
     }
 
     /**
