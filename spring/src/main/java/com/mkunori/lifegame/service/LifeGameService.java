@@ -94,4 +94,17 @@ public class LifeGameService {
     public void placePattern(PatternType patternType, int row, int col) {
         board.placePattern(patternType, row, col);
     }
+
+    /**
+     * 盤面を指定されたサイズに変更します。
+     *
+     * サイズ変更時は、既存のセル状態を引き継がず、
+     * 新しい空の盤面を作成します。
+     *
+     * @param rows 新しい行数
+     * @param cols 新しい列数
+     */
+    public void resize(int rows, int cols) {
+        board.resize(rows, cols);
+    }
 }

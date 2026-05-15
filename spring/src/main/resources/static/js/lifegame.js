@@ -33,6 +33,9 @@ let patternDefinitions = {};
 // false の場合は、Place Pattern関連の操作を無効化します。
 let patternDefinitionsLoaded = false;
 
+// 盤面上のセルボタンをすべて取得します。
+let cellButtons = document.querySelectorAll(".cell");
+
 // ==================================================
 // HTML要素の取得
 // ==================================================
@@ -67,9 +70,6 @@ const actionModeSelect = document.getElementById("actionMode");
 // Edit Modeの補足説明を表示する要素を取得します。
 const editModeHelp = document.getElementById("editModeHelp");
 
-// 盤面上のセルボタンをすべて取得します。
-const cellButtons = document.querySelectorAll(".cell");
-
 // 速度調整スライダーを取得します。
 const speedSlider = document.getElementById("speedSlider");
 
@@ -84,6 +84,21 @@ const boardElement = document.querySelector(".board");
 
 // Patternの補足説明を表示する要素を取得します。
 const patternHelp = document.getElementById("patternHelp");
+
+// 行数入力欄を取得します。
+const rowInput = document.getElementById("rowInput");
+
+// 列数入力欄を取得します。
+const colInput = document.getElementById("colInput");
+
+// Resizeボタンを取得します。
+const resizeButton = document.getElementById("resizeButton");
+
+// 現在の行数を表示している要素を取得します。
+const rowValue = document.getElementById("rowValue");
+
+// 現在の列数を表示している要素を取得します。
+const colValue = document.getElementById("colValue");
 
 // ==================================================
 // イベント登録
@@ -128,21 +143,6 @@ randomButton.addEventListener("click", async () => {
     applyBoardIfAvailable(board);
 });
 
-// 各セルに、クリック、ドラッグ描画、パターンプレビュー用のイベントを登録します。
-cellButtons.forEach((button) => {
-    // マウスボタンを押したセルを編集し、ドラッグ開始状態にします。
-    button.addEventListener("mousedown", (event) => {
-        startCellDrag(event, button);
-    });
-
-    // ドラッグ中に別のセルへ入ったら、そのセルを編集します。
-    // Place Patternモードの場合は、プレビュー位置を更新します。
-    button.addEventListener("mouseenter", () => {
-        dragOverCell(button);
-        updatePatternPreview(button);
-    });
-});
-
 // 画面上でマウスボタンを離したら、ドラッグ終了にします。
 document.addEventListener("mouseup", () => {
     endCellDrag();
@@ -169,6 +169,33 @@ boardElement.addEventListener("mouseleave", () => {
     clearPatternPreview();
 });
 
+// Resizeボタンが押されたとき、自動再生を停止して盤面サイズを変更します。
+resizeButton.addEventListener("click", () => {
+    resizeBoardByApi();
+});
+
+/**
+ * 盤面上のセルに、クリック、ドラッグ描画、パターンプレビュー用のイベントを登録します。
+ *
+ * 盤面サイズ変更後はセル要素が作り直されるため、
+ * 新しいセルに対してこの関数を再実行します。
+ */
+function registerCellEvents() {
+    cellButtons.forEach((button) => {
+        // マウスボタンを押したセルを編集し、ドラッグ開始状態にします。
+        button.addEventListener("mousedown", (event) => {
+            startCellDrag(event, button);
+        });
+
+        // ドラッグ中に別のセルへ入ったら、そのセルを編集します。
+        // Place Patternモードの場合は、プレビュー位置を更新します。
+        button.addEventListener("mouseenter", () => {
+            dragOverCell(button);
+            updatePatternPreview(button);
+        });
+    });
+}
+
 // ==================================================
 // 初期化
 // ==================================================
@@ -180,13 +207,14 @@ initialize();
  * 初期表示時の準備を行います。
  *
  * Java側からパターン定義を取得し、
+ * セルイベントを登録し、
  * Action Modeに合わせてUI状態を整えます。
  */
 async function initialize() {
     await loadPatternDefinitions();
+    registerCellEvents();
     updateControlsForActionMode();
 }
-
 /**
  * Java側からパターン定義を取得して、JavaScript側で使いやすい形に変換します。
  */
@@ -502,6 +530,47 @@ function applyBoardIfAvailable(board) {
     }
 
     updateBoardView(board, generationValue, cellButtons);
+}
+
+/**
+ * 盤面サイズを変更します。
+ *
+ * @param {number} rows 新しい行数
+ * @param {number} cols 新しい列数
+ * @return {Promise<object|null>} 更新後の盤面データ
+ */
+async function resizeBoardApi(rows, cols) {
+    return await postBoardApi("/lifegame/api/resize", {
+        rows: rows,
+        cols: cols
+    });
+}
+
+/**
+ * 自動再生を停止して、盤面サイズを変更します。
+ *
+ * サイズ変更時は新しい空の盤面を作成し、
+ * 盤面HTMLも新しいサイズに合わせて再生成します。
+ */
+async function resizeBoardByApi() {
+    stopAutoPlay();
+    clearPatternPreview();
+
+    const rows = Number(rowInput.value);
+    const cols = Number(colInput.value);
+    const board = await resizeBoardApi(rows, cols);
+
+    if (board === null) {
+        return;
+    }
+
+    rebuildBoardView(board, boardElement);
+
+    cellButtons = document.querySelectorAll(".cell");
+    registerCellEvents();
+
+    updateGeneration(board.generation, generationValue);
+    updateBoardSize(board.rows, board.cols, rowValue, colValue);
 }
 
 // ==================================================

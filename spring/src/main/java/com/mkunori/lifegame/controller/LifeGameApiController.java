@@ -2,6 +2,7 @@ package com.mkunori.lifegame.controller;
 
 import com.mkunori.lifegame.controller.request.EditCellsRequest;
 import com.mkunori.lifegame.controller.request.PlacePatternRequest;
+import com.mkunori.lifegame.controller.request.ResizeBoardRequest;
 import com.mkunori.lifegame.controller.response.PatternDefinitionResponse;
 import com.mkunori.lifegame.model.LifeGameBoard;
 import com.mkunori.lifegame.model.PatternType;
@@ -126,5 +127,20 @@ public class LifeGameApiController {
         return Arrays.stream(PatternType.values())
                 .map(PatternDefinitionResponse::from)
                 .toList();
+    }
+
+    /**
+     * 盤面サイズを変更して、更新後の盤面データを返します。
+     *
+     * サイズ変更時は、既存のセル状態を引き継がず、
+     * 新しい空の盤面を作成します。
+     *
+     * @param request 新しい盤面サイズを含むリクエスト
+     * @return 更新後のライフゲーム盤面
+     */
+    @PostMapping("/lifegame/api/resize")
+    public LifeGameBoard resize(@RequestBody ResizeBoardRequest request) {
+        lifeGameService.resize(request.rows(), request.cols());
+        return lifeGameService.getBoard();
     }
 }

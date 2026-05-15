@@ -60,3 +60,49 @@ function toggleCellViewOnly(button) {
     const isAlive = button.classList.contains("alive");
     setCellViewOnly(button, !isAlive);
 }
+
+/**
+ * 盤面のHTMLを、指定された盤面データに合わせて作り直します。
+ *
+ * 盤面サイズが変わるとセル数も変わるため、
+ * 既存のセルを更新するのではなく、boardElementの中身を再生成します。
+ *
+ * @param {object} board Spring Boot側から返された盤面データ
+ * @param {HTMLElement} boardElement 盤面全体の要素
+ */
+function rebuildBoardView(board, boardElement) {
+    boardElement.innerHTML = "";
+
+    board.cells.forEach((row, rowIndex) => {
+        const rowElement = document.createElement("div");
+        rowElement.classList.add("board-row");
+
+        row.forEach((alive, colIndex) => {
+            const cellButton = document.createElement("button");
+
+            cellButton.type = "button";
+            cellButton.classList.add("cell");
+            cellButton.classList.add(alive ? "alive" : "dead");
+            cellButton.dataset.row = rowIndex;
+            cellButton.dataset.col = colIndex;
+            cellButton.setAttribute("aria-label", "Edit cell");
+
+            rowElement.appendChild(cellButton);
+        });
+
+        boardElement.appendChild(rowElement);
+    });
+}
+
+/**
+ * 盤面サイズ表示を更新します。
+ *
+ * @param {number} rows 行数
+ * @param {number} cols 列数
+ * @param {HTMLElement} rowValue 行数表示要素
+ * @param {HTMLElement} colValue 列数表示要素
+ */
+function updateBoardSize(rows, cols, rowValue, colValue) {
+    rowValue.textContent = rows;
+    colValue.textContent = cols;
+}

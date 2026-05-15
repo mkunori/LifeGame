@@ -57,6 +57,21 @@
                 <!-- Randomボタンです。ランダム配置します。 -->
                 <button type="button" id="randomButton" class="control-button">Random</button>
             </div>
+
+            <!-- 盤面サイズを変更する領域です -->
+            <div class="control-row">
+                <label for="rowInput">Rows:</label>
+                <input type="number" id="rowInput" class="size-input" th:min="${minRows}" th:max="${maxRows}"
+                    th:value="${board.rows}">
+                <span class="range-help" th:text="|(${minRows}〜${maxRows})|">(10〜80)</span>
+
+                <label for="colInput">Cols:</label>
+                <input type="number" id="colInput" class="size-input" th:min="${minCols}" th:max="${maxCols}"
+                    th:value="${board.cols}">
+                <span class="range-help" th:text="|(${minCols}〜${maxCols})|">(10〜120)</span>
+
+                <button type="button" id="resizeButton" class="control-button">Resize</button>
+            </div>
         </section>
 
         <!-- 編集操作のグループです -->
@@ -114,9 +129,9 @@
         <!-- 盤面サイズを表示します -->
         <p>
             Board size:
-            <span th:text="${board.rows}">0</span>
+            <span id="rowValue" th:text="${board.rows}">0</span>
             x
-            <span th:text="${board.cols}">0</span>
+            <span id="colValue" th:text="${board.cols}">0</span>
         </p>
     </div>
 

@@ -10,24 +10,45 @@ import java.util.Random;
  */
 public class LifeGameBoard {
 
-    private final int rows;
-    private final int cols;
+    private int rows;
+    private int cols;
     private boolean[][] cells;
     private int generation;
-    private final Random random = new Random();
+    private Random random = new Random();
 
     /**
-     * 指定された行数と列数で盤面を作成します。
+     * 盤面の最小行数です。
+     */
+    public static final int MIN_ROWS = 10;
+
+    /**
+     * 盤面の最大行数です。
+     */
+    public static final int MAX_ROWS = 80;
+
+    /**
+     * 盤面の最小列数です。
+     */
+    public static final int MIN_COLS = 10;
+
+    /**
+     * 盤面の最大列数です。
+     */
+    public static final int MAX_COLS = 120;
+
+    /**
+     * 指定されたサイズの盤面を作成します。
      *
-     * @param rows 盤面の行数
-     * @param cols 盤面の列数
+     * @param rows 行数
+     * @param cols 列数
      */
     public LifeGameBoard(int rows, int cols) {
+        validateSize(rows, cols);
+
         this.rows = rows;
         this.cols = cols;
         this.cells = new boolean[rows][cols];
         this.generation = 0;
-        initializeSamplePattern();
     }
 
     /**
@@ -319,5 +340,42 @@ public class LifeGameBoard {
         cells[centerRow][centerCol - 1] = true;
         cells[centerRow][centerCol] = true;
         cells[centerRow][centerCol + 1] = true;
+    }
+
+    /**
+     * 盤面を指定されたサイズに変更します。
+     *
+     * サイズ変更時は、既存のセル状態を引き継がず、
+     * 新しい空の盤面を作成します。
+     * 世代数も0に戻します。
+     *
+     * @param rows 新しい行数
+     * @param cols 新しい列数
+     */
+    public void resize(int rows, int cols) {
+        validateSize(rows, cols);
+
+        this.rows = rows;
+        this.cols = cols;
+        this.cells = new boolean[rows][cols];
+        this.generation = 0;
+    }
+
+    /**
+     * 盤面サイズが許可範囲内か確認します。
+     *
+     * @param rows 行数
+     * @param cols 列数
+     */
+    private void validateSize(int rows, int cols) {
+        if (rows < MIN_ROWS || rows > MAX_ROWS) {
+            throw new IllegalArgumentException(
+                    "rows must be between " + MIN_ROWS + " and " + MAX_ROWS + ".");
+        }
+
+        if (cols < MIN_COLS || cols > MAX_COLS) {
+            throw new IllegalArgumentException(
+                    "cols must be between " + MIN_COLS + " and " + MAX_COLS + ".");
+        }
     }
 }

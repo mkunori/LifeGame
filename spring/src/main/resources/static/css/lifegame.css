@@ -163,3 +163,16 @@ select:disabled {
     outline-offset: -2px;
     background-color: rgba(220, 0, 0, 0.35);
 }
+
+/* 盤面サイズ入力欄です */
+.size-input {
+    width: 80px;
+    padding: 8px;
+    font-size: 16px;
+}
+
+/* 入力可能な範囲を示す短い説明です */
+.range-help {
+    font-size: 13px;
+    color: #666666;
+}
