@@ -8,6 +8,7 @@ import com.mkunori.lifegame.model.PatternType;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.annotation.SessionScope;
 
 /**
  * ライフゲームの処理を担当するサービスクラスです。
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
  * 画面から直接Modelを操作させず、Serviceを通して処理する構成にしています。
  */
 @Service
+@SessionScope
 public class LifeGameService {
 
     private final LifeGameBoard board = new LifeGameBoard(60, 100);

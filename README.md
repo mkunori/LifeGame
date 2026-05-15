@@ -44,6 +44,7 @@ Swing版で作成したライフゲームの考え方をもとに、Web画面、
 ### Spring Boot版
 
 - ブラウザ上でのライフゲーム盤面表示
+- セッションごとの盤面管理
 - 盤面操作モード選択（Edit Cell / Place Pattern）
 - 描画モード選択（Toggle / Draw / Erase）
 - パターン配置時のプレビュー表示
@@ -478,7 +479,6 @@ sequenceDiagram
 
 ### Spring Boot版
 
-- セッションごとの盤面管理
 - JavaScriptのさらなる責務分離
 - レスポンシブ表示の改善
 - 公開前のCPU・メモリ負荷対策
