@@ -183,6 +183,16 @@ Nginx : 80
 Spring Boot : 8080
 ```
 
+### HTTPS化
+
+独自ドメインを取得し、Let's Encrypt / Certbot を使ってHTTPS化しています。
+
+- ドメイン: mkunori.com
+- HTTPS: https://mkunori.com/lifegame
+- 証明書管理: Certbot
+- Webサーバー: Nginx
+- HTTPアクセスはHTTPSへリダイレクト
+
 ## ■ 負荷対策
 
 Spring Boot版を公開するにあたり、最低限の負荷対策を行っています。
@@ -623,3 +633,6 @@ sequenceDiagram
 - Nginx / systemd / JVMによる最低限の負荷対策
 - Service層でのサーバー側入力値チェック
 - JUnitによるService層の単体テスト
+- 独自ドメインを使ったWebアプリ公開
+- Let's Encrypt / Certbot によるHTTPS化
+- NginxでのHTTPからHTTPSへのリダイレクト設定
