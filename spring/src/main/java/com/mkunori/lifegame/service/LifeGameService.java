@@ -173,6 +173,35 @@ public class LifeGameService {
         if (cells.stream().anyMatch(cell -> cell == null)) {
             throw new IllegalArgumentException("cells must not contain null.");
         }
+
+        cells.forEach(this::validateCellPosition);
+    }
+
+    /**
+     * 指定されたセル位置が現在の盤面内にあるか確認します。
+     *
+     * @param cell 確認するセル位置
+     */
+    private void validateCellPosition(CellPosition cell) {
+        validateCellPosition(cell.row(), cell.col());
+    }
+
+    /**
+     * 指定された行番号・列番号が現在の盤面内にあるか確認します。
+     *
+     * @param row 行番号
+     * @param col 列番号
+     */
+    private void validateCellPosition(int row, int col) {
+        if (row < 0 || row >= board.getRows()) {
+            throw new IllegalArgumentException(
+                    "row must be between 0 and " + (board.getRows() - 1) + ".");
+        }
+
+        if (col < 0 || col >= board.getCols()) {
+            throw new IllegalArgumentException(
+                    "col must be between 0 and " + (board.getCols() - 1) + ".");
+        }
     }
 
     /**
@@ -186,6 +215,8 @@ public class LifeGameService {
         if (patternType == null) {
             throw new IllegalArgumentException("patternType must not be null.");
         }
+
+        validateCellPosition(row, col);
 
         lastPlacePatternTime = validateIntervalAndGetNow(
                 lastPlacePatternTime, PATTERN_ACTION_INTERVAL, "place-pattern");
