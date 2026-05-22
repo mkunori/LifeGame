@@ -56,6 +56,11 @@ Swing版で作成したライフゲームの考え方をもとに、Web画面、
   - Rows: 10〜80
   - Cols: 10〜120
   - Resize時は新しい空盤面を作成
+- サーバー側の入力値チェック
+  - 盤面サイズの下限・上限チェック
+  - セル編集時の座標範囲チェック
+  - パターン配置時の基準座標チェック
+  - 不正なリクエストは 400 Bad Request として返却
 
 ## ■ 操作方法
 
@@ -134,6 +139,101 @@ Swing版で作成したライフゲームの考え方をもとに、Web画面、
 - パターン配置プレビュー  
   配置可能な場合は青、既存セルと重なる場合は黄、盤面外にはみ出す場合は赤で表示します
 
+## ■ 公開環境
+
+Spring Boot版はVPS上に公開しています。
+
+### 構成
+
+```text
+Client
+↓
+Nginx
+↓
+Spring Boot Application
+↓
+LifeGameService
+↓
+LifeGameBoard
+```
+
+### 使用している主な技術
+
+- さくらのVPS
+- Ubuntu Server
+- OpenJDK 21
+- Spring Boot
+- Thymeleaf
+- JavaScript
+- Nginx
+- systemd
+
+### デプロイ構成
+
+Spring Bootアプリケーションをjarとしてビルドし、systemdでサービス化しています。  
+外部からのHTTPアクセスはNginxで受け取り、内部のSpring Bootアプリケーションへリバースプロキシしています。  
+
+```text
+Browser
+↓
+http://<server>/lifegame
+↓
+Nginx : 80
+↓
+Spring Boot : 8080
+```
+
+## ■ 負荷対策
+
+Spring Boot版を公開するにあたり、最低限の負荷対策を行っています。
+
+### Nginxによるリクエスト制限
+
+同一IPアドレスからの過剰なリクエストを抑制するため、Nginxでリクエスト制限を設定しています。
+
+LifeGameはStart中に一定間隔でAPIを呼び出すため、通常操作を妨げない範囲で制限値を調整しています。
+
+### systemd / JVMによるリソース制限
+
+JavaプロセスがVPS全体のリソースを使い切らないように、systemdとJVMオプションでCPU・メモリ使用量を制限しています。
+
+- JVMヒープサイズの上限を設定
+- systemdでメモリ使用量の上限を設定
+- systemdでCPU使用率の上限を設定
+
+### アプリケーション側の入力値チェック
+
+APIに対して不正な値が送信された場合に備えて、Service層で入力値チェックを行っています。
+
+- 盤面サイズの下限・上限チェック
+- セル編集時の座標範囲チェック
+- パターン配置時の基準座標チェック
+- 一度に編集できるセル数の上限チェック
+- 不正なリクエストに対する 400 Bad Request の返却
+
+これにより、フロントエンドの入力制限を回避して直接APIを呼び出された場合でも、サーバー側で不正な操作を防ぐようにしています。
+
+## ■ テスト
+
+Spring Boot版では、JUnitを使ってテストを追加しています。
+
+### 主なテスト内容
+
+- Spring Bootアプリケーションの起動確認
+- LifeGameServiceの入力値チェック
+  - 範囲外の行番号を指定した場合の例外確認
+  - 範囲外の列番号を指定した場合の例外確認
+  - セル編集APIで不正な座標を受け付けないことの確認
+  - パターン配置APIで不正な基準座標を受け付けないことの確認
+
+### テスト実行
+
+Spring Boot版のディレクトリで以下を実行します。
+
+```powershell
+.\mvnw.cmd test
+```
+
 ## ■ パッケージ構成
 
 ### Swing版
@@ -176,16 +276,20 @@ spring
 │  │  └─ ActionMode.java                    // Edit Cell / Place Pattern を定義
 │  └─ service
 │     └─ LifeGameService.java               // ControllerとModelの間で処理を仲介
-└─ src/main/resources
-   ├─ templates
-   │  └─ lifegame.html                      // 初期画面を表示するThymeleafテンプレート
-   └─ static
-      ├─ css
-      │  └─ lifegame.css                    // 画面デザイン
-      └─ js
-         ├─ lifegameApi.js                  // Spring Boot API呼び出しを担当
-         ├─ lifegameView.js                 // 盤面や世代数、盤面HTMLの更新を担当
-         └─ lifegame.js                     // イベント登録、自動再生、ドラッグ操作などを担当
+├─ src/main/resources
+│  ├─ templates
+│  │  └─ lifegame.html                      // 初期画面を表示するThymeleafテンプレート
+│  └─ static
+│     ├─ css
+│     │  └─ lifegame.css                    // 画面デザイン
+│     └─ js
+│        ├─ lifegameApi.js                  // Spring Boot API呼び出しを担当
+│        ├─ lifegameView.js                 // 盤面や世代数、盤面HTMLの更新を担当
+│        └─ lifegame.js                     // イベント登録、自動再生、ドラッグ操作などを担当
+└─ src/test/java/com/mkunori/lifegame
+   ├─ LifeGameSpringApplicationTests.java   // Spring Bootアプリケーションの起動確認
+   └─ service
+      └─ LifeGameServiceTest.java           // Service層の入力値チェックを確認
 
 <初期表示>
 ブラウザ
@@ -474,11 +578,16 @@ sequenceDiagram
 
 ### Spring Boot版
 
-- 公開前のCPU・メモリ負荷対策の強化
+- 負荷対策のさらなる改善
+  - セッション数が増えた場合の扱い
+  - ログ量の確認
+  - APIエラー時の画面表示改善
 - レスポンシブ表示の改善
 - JavaScriptのさらなる責務分離
 - パターン追加
-- テストコードの充実
+- テストコードのさらなる充実
+- HTTPS化
+- 独自ドメインでの公開
 
 ## ■ 学習ポイント
 
@@ -507,3 +616,10 @@ sequenceDiagram
   - イベント制御
 - JavaScriptによるパターン配置プレビューの実装
 - UIを Simulation / Board / Edit に分ける画面整理
+- VPSを使ったSpring Bootアプリケーションの公開
+- Nginxによるリバースプロキシ設定
+- systemdによるJavaアプリケーションのサービス化
+- SSH鍵認証、rootログイン無効化、ファイアウォール設定などの基本的なサーバー初期設定
+- Nginx / systemd / JVMによる最低限の負荷対策
+- Service層でのサーバー側入力値チェック
+- JUnitによるService層の単体テスト
