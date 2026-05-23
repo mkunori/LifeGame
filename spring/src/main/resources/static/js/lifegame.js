@@ -52,9 +52,6 @@ const stopButton = document.getElementById("stopButton");
 // Clearボタンを取得します。
 const clearButton = document.getElementById("clearButton");
 
-// Resetボタンを取得します。
-const resetButton = document.getElementById("resetButton");
-
 // Randomボタンを取得します。
 const randomButton = document.getElementById("randomButton");
 
@@ -124,14 +121,6 @@ clearButton.addEventListener("click", async () => {
     stopAutoPlay();
 
     const board = await clearBoardApi();
-    applyBoardIfAvailable(board);
-});
-
-// Resetボタンが押されたとき、自動再生を停止して初期状態へ戻します。
-resetButton.addEventListener("click", async () => {
-    stopAutoPlay();
-
-    const board = await resetBoardApi();
     applyBoardIfAvailable(board);
 });
 

@@ -218,17 +218,6 @@ public class LifeGameBoard {
     }
 
     /**
-     * 盤面を初期状態に戻します。
-     *
-     * すべてのセルを死んだ状態にしたあと、動作確認用の初期パターンを配置します。
-     * 世代数も0に戻します。
-     */
-    public void reset() {
-        clear();
-        initializeSamplePattern();
-    }
-
-    /**
      * 盤面上のセルをランダムに生きた状態または死んだ状態にします。
      *
      * 現在は、およそ30%の確率でセルが生きるようにしています。
@@ -358,20 +347,6 @@ public class LifeGameBoard {
                 cells[row][col] = true;
             }
         }
-    }
-
-    /**
-     * 動作確認用の初期パターンを配置します。
-     *
-     * ここでは、ライフゲームでよく使われるブリンカーを配置しています。
-     */
-    private void initializeSamplePattern() {
-        int centerRow = rows / 2;
-        int centerCol = cols / 2;
-
-        cells[centerRow][centerCol - 1] = true;
-        cells[centerRow][centerCol] = true;
-        cells[centerRow][centerCol + 1] = true;
     }
 
     /**

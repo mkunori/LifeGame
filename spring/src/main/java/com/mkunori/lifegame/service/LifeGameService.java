@@ -43,7 +43,7 @@ public class LifeGameService {
     private static final Duration PATTERN_ACTION_INTERVAL = Duration.ofMillis(100);
 
     /**
-     * Clear、Reset、Randomなど、盤面全体を変更するAPIの最短実行間隔です。
+     * Clear、Randomなど、盤面全体を変更するAPIの最短実行間隔です。
      */
     private static final Duration BOARD_ACTION_INTERVAL = Duration.ofMillis(200);
 
@@ -106,16 +106,6 @@ public class LifeGameService {
                 lastBoardActionTime, BOARD_ACTION_INTERVAL, "board-action");
 
         board.clear();
-    }
-
-    /**
-     * 盤面を初期状態に戻します。
-     */
-    public void reset() {
-        lastBoardActionTime = validateIntervalAndGetNow(
-                lastBoardActionTime, BOARD_ACTION_INTERVAL, "board-action");
-
-        board.reset();
     }
 
     /**

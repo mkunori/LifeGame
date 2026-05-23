@@ -21,7 +21,7 @@ https://mkunori.com/lifegame
 公開URLにアクセスし、画面上の操作UIからライフゲームを操作できます。
 
 - Simulation: Step / Start / Stop / Speed
-- Board: Clear / Reset / Random / Resize
+- Board: Clear / Random / Resize
 - Edit: セル編集、ドラッグ描画、パターン配置
 
 詳細な操作は画面上のボタン・選択項目に従って行います。
@@ -38,7 +38,6 @@ Spring Boot版では、以下の機能を実装しています。
 - 世代数の表示
 - ランダム配置
 - 全消去
-- 初期状態へのリセット
 
 ### セル編集
 

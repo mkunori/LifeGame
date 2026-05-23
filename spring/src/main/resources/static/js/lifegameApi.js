@@ -89,15 +89,6 @@ async function clearBoardApi() {
 }
 
 /**
- * 盤面を初期状態に戻します。
- *
- * @return {Promise<object|null>} 更新後の盤面データ
- */
-async function resetBoardApi() {
-    return await postBoardApi("/lifegame/api/reset");
-}
-
-/**
  * 盤面をランダム配置にします。
  *
  * @return {Promise<object|null>} 更新後の盤面データ

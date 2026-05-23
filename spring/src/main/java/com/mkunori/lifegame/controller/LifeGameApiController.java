@@ -63,17 +63,6 @@ public class LifeGameApiController {
     }
 
     /**
-     * 盤面を初期状態に戻して、更新後の盤面データを返します。
-     *
-     * @return 更新後のライフゲーム盤面
-     */
-    @PostMapping("/lifegame/api/reset")
-    public LifeGameBoard reset() {
-        lifeGameService.reset();
-        return lifeGameService.getBoard();
-    }
-
-    /**
      * 盤面をランダムに配置して、更新後の盤面データを返します。
      *
      * @return 更新後のライフゲーム盤面
