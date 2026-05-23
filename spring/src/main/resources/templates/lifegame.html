@@ -38,7 +38,7 @@
     </section>
 
     <!-- 操作用の領域全体です -->
-    <div class="control-panel">
+    <div class="control">
 
         <!-- シミュレーション操作のグループです -->
         <section class="control-group">
@@ -53,14 +53,10 @@
 
                 <!-- Stopボタンです。自動再生を停止します。 -->
                 <button type="button" id="stopButton" class="control-button">Stop</button>
-            </div>
 
-            <!-- 自動再生の速度を調整する領域です -->
-            <div class="control-row">
+                <!-- 自動再生の速度を調整する領域です -->
                 <label for="speedSlider">Speed:</label>
-
                 <input type="range" id="speedSlider" min="100" max="1000" step="50" value="300">
-
                 <span id="speedValue">300 ms</span>
             </div>
         </section>
@@ -75,10 +71,8 @@
 
                 <!-- Randomボタンです。ランダム配置します。 -->
                 <button type="button" id="randomButton" class="control-button">Random</button>
-            </div>
 
-            <!-- 盤面サイズを変更する領域です -->
-            <div class="control-row">
+                <!-- 盤面サイズを変更する領域です -->
                 <label for="rowInput">Rows:</label>
                 <input type="number" id="rowInput" class="size-input" th:min="${minRows}" th:max="${maxRows}"
                     th:value="${board.rows}">
@@ -106,10 +100,8 @@
                         Action Mode
                     </option>
                 </select>
-            </div>
 
-            <!-- セル編集モードを選択する領域です -->
-            <div class="control-row">
+                <!-- セル編集モードを選択する領域です -->
                 <label for="cellEditMode">Edit Mode:</label>
 
                 <select id="cellEditMode" name="cellEditMode">
@@ -119,10 +111,8 @@
                 </select>
 
                 <span id="editModeHelp" class="help-text"></span>
-            </div>
 
-            <!-- パターン配置用の操作領域です -->
-            <div class="control-row">
+                <!-- パターン配置用の操作領域です -->
                 <label for="patternType">Pattern:</label>
 
                 <select id="patternType" name="patternType">
