@@ -176,3 +176,47 @@ select:disabled {
     font-size: 13px;
     color: #666666;
 }
+
+/* アプリ説明と使い方をカード風に表示します。 */
+.app-intro,
+.usage-guide {
+    max-width: 900px;
+    margin: 16px auto;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fafafa;
+}
+
+/* アプリ説明文の余白を調整します。 */
+.app-description {
+    margin: 0 0 8px;
+}
+
+/* GitHubリンク行の余白を調整します。 */
+.app-links {
+    margin: 0;
+}
+
+/* GitHubリンクを少し目立たせます。 */
+.app-links a {
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* GitHubリンクにマウスを乗せたときに下線を表示します。 */
+.app-links a:hover {
+    text-decoration: underline;
+}
+
+/* 使い方セクションの見出しを少し小さめに整えます。 */
+.usage-guide h2 {
+    margin-top: 0;
+    font-size: 1.1rem;
+}
+
+/* 使い方リストの余白を調整します。 */
+.usage-guide ul {
+    margin: 8px 0 0;
+    padding-left: 1.5rem;
+}
