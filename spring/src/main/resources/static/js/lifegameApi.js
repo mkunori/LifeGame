@@ -2,6 +2,22 @@
 // LifeGame API
 // ==================================================
 
+/** Context-Path */
+const contextPath = document.body.dataset.contextPath || "";
+
+/**
+ * Context Path付きのAPI URLを作成します。
+ *
+ * 本番環境で server.servlet.context-path=/lifegame を指定している場合、
+ * /api/step は /lifegame/api/step として呼び出されます。
+ *
+ * @param {string} path APIのパス
+ * @return {string} Context Path付きのAPI URL
+ */
+function apiUrl(path) {
+    return `${contextPath}${path}`;
+}
+
 /**
  * 指定されたAPIを呼び出して、更新後の盤面データを取得します。
  *
@@ -46,7 +62,7 @@ async function postBoardApi(url, requestBody = null) {
  * @return {Promise<object|null>} 更新後の盤面データ
  */
 async function stepBoardApi() {
-    return await postBoardApi("/lifegame/api/step");
+    return await postBoardApi(apiUrl("/api/step"));
 }
 
 /**
@@ -57,7 +73,7 @@ async function stepBoardApi() {
  * @return {Promise<object|null>} 更新後の盤面データ
  */
 async function editCellsApi(mode, cells) {
-    return await postBoardApi("/lifegame/api/edit-cells", {
+    return await postBoardApi(apiUrl("/api/edit-cells"), {
         mode: mode,
         cells: cells
     });
@@ -72,7 +88,7 @@ async function editCellsApi(mode, cells) {
  * @return {Promise<object|null>} 更新後の盤面データ
  */
 async function placePatternApi(patternType, row, col) {
-    return await postBoardApi("/lifegame/api/pattern", {
+    return await postBoardApi(apiUrl("/api/pattern"), {
         patternType: patternType,
         row: row,
         col: col
@@ -85,7 +101,7 @@ async function placePatternApi(patternType, row, col) {
  * @return {Promise<object|null>} 更新後の盤面データ
  */
 async function clearBoardApi() {
-    return await postBoardApi("/lifegame/api/clear");
+    return await postBoardApi(apiUrl("/api/clear"));
 }
 
 /**
@@ -94,7 +110,7 @@ async function clearBoardApi() {
  * @return {Promise<object|null>} 更新後の盤面データ
  */
 async function randomizeBoardApi() {
-    return await postBoardApi("/lifegame/api/random");
+    return await postBoardApi(apiUrl("/api/random"));
 }
 
 /**
@@ -106,7 +122,7 @@ async function randomizeBoardApi() {
  */
 async function getPatternDefinitionsApi() {
     try {
-        const response = await fetch("/lifegame/api/pattern-definitions", {
+        const response = await fetch(apiUrl("/api/pattern-definitions"), {
             method: "GET"
         });
 
@@ -131,7 +147,7 @@ async function getPatternDefinitionsApi() {
  * @return {Promise<object|null>} 更新後の盤面データ
  */
 async function resizeBoardApi(rows, cols) {
-    return await postBoardApi("/lifegame/api/resize", {
+    return await postBoardApi(apiUrl("/api/resize"), {
         rows: rows,
         cols: cols
     });

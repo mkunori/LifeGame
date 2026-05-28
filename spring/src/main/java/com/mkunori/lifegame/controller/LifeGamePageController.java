@@ -40,7 +40,7 @@ public class LifeGamePageController {
      * @param model HTMLテンプレートへ渡すデータを入れるための入れ物
      * @return 表示するテンプレート名
      */
-    @GetMapping("/lifegame")
+    @GetMapping({ "", "/" })
     public String showLifeGame(Model model) {
         model.addAttribute("board", lifeGameService.getBoard());
         model.addAttribute("patternTypes", PatternType.values());

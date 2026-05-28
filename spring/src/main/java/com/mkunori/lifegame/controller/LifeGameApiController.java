@@ -45,7 +45,7 @@ public class LifeGameApiController {
      *
      * @return 更新後のライフゲーム盤面
      */
-    @PostMapping("/lifegame/api/step")
+    @PostMapping("/api/step")
     public LifeGameBoard step() {
         lifeGameService.nextGeneration();
         return lifeGameService.getBoard();
@@ -56,7 +56,7 @@ public class LifeGameApiController {
      *
      * @return 更新後のライフゲーム盤面
      */
-    @PostMapping("/lifegame/api/clear")
+    @PostMapping("/api/clear")
     public LifeGameBoard clear() {
         lifeGameService.clear();
         return lifeGameService.getBoard();
@@ -67,7 +67,7 @@ public class LifeGameApiController {
      *
      * @return 更新後のライフゲーム盤面
      */
-    @PostMapping("/lifegame/api/random")
+    @PostMapping("/api/random")
     public LifeGameBoard randomize() {
         lifeGameService.randomize();
         return lifeGameService.getBoard();
@@ -82,7 +82,7 @@ public class LifeGameApiController {
      * @param request 編集モードとセル位置の一覧を含むリクエスト
      * @return 更新後のライフゲーム盤面
      */
-    @PostMapping("/lifegame/api/edit-cells")
+    @PostMapping("/api/edit-cells")
     public LifeGameBoard editCells(@RequestBody EditCellsRequest request) {
         lifeGameService.editCells(request.mode(), request.cells());
         return lifeGameService.getBoard();
@@ -97,7 +97,7 @@ public class LifeGameApiController {
      * @param request 配置するパターンの種類と位置を含むリクエスト
      * @return 更新後のライフゲーム盤面
      */
-    @PostMapping("/lifegame/api/pattern")
+    @PostMapping("/api/pattern")
     public LifeGameBoard placePattern(@RequestBody PlacePatternRequest request) {
         lifeGameService.placePattern(request.patternType(), request.row(), request.col());
         return lifeGameService.getBoard();
@@ -111,7 +111,7 @@ public class LifeGameApiController {
      *
      * @return パターン定義の一覧
      */
-    @GetMapping("/lifegame/api/pattern-definitions")
+    @GetMapping("/api/pattern-definitions")
     public List<PatternDefinitionResponse> getPatternDefinitions() {
         return Arrays.stream(PatternType.values())
                 .map(PatternDefinitionResponse::from)
@@ -127,7 +127,7 @@ public class LifeGameApiController {
      * @param request 新しい盤面サイズを含むリクエスト
      * @return 更新後のライフゲーム盤面
      */
-    @PostMapping("/lifegame/api/resize")
+    @PostMapping("/api/resize")
     public LifeGameBoard resize(@RequestBody ResizeBoardRequest request) {
         lifeGameService.resize(request.rows(), request.cols());
         return lifeGameService.getBoard();
