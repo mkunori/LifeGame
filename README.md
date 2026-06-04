@@ -103,7 +103,7 @@ HTTPS
 ↓
 Nginx
 ↓
-Spring Boot Application : 8080
+Spring Boot Application : 18080
 ```
 
 ### 主な構成
